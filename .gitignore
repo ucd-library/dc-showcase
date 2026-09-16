@@ -1,0 +1,15 @@
+node_modules
+services/client/client/dist
+services/client/client/public/js
+.DS_Store
+.cache
+run.js
+corkbuild.Dockerfile
+*.cork-build.json
+collection-import/download-checker-data
+tools/redirects/map.json
+tools/redirects/redirects.csv
+tools/redirects/package-lock.json
+tools/ocr/pg
+tools/ocr/files
+tools/ocr/package-lock.json

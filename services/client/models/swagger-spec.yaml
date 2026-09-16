@@ -1,0 +1,11 @@
+openapi: 3.0.0
+info:
+  title: DAMS API
+  version: 1.0.0
+  description: This is the Swagger documentation for DAMS.
+  license:
+    name: Licensed Under MIT
+    url: https://spdx.org/licenses/MIT.html
+  contact:
+    name: Online Strategy - UC Davis Library
+    url: https://library.ucdavis.edu/online-strategy/

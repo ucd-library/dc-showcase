@@ -1,0 +1,20 @@
+{
+  "name": "@ucd-lib/dcs-gateway",
+  "version": "1.0.0",
+  "main": "index.js",
+  "type": "module",
+  "directories": {
+    "lib": "lib"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "license": "MIT",
+  "description": "Inspects requests to the Digital Collections Showcase site and routes them to either the fin/Fedora backend or directly out of caskfs.",
+  "dependencies": {
+    "dotenv": "^16.4.7",
+    "express": "^4.21.2",
+    "http-proxy": "^1.18.1",
+    "node-fetch": "^3.3.2"
+  }
+}

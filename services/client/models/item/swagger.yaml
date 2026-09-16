@@ -1,0 +1,246 @@
+tags:
+  - name: item
+    description: Item Information
+paths:
+  /api/item/{itemId}:
+    get:
+      tags:
+        - item
+      summary: Get item information by id
+      description: Get item information by id
+      parameters:
+        - name: itemId
+          in: path
+          description: ID of item
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  '@graph':
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        fileFormatSimple:
+                          type: string
+                        filename:
+                          type: string
+                        fileSize:
+                          type: integer
+                        '@type':
+                          type: array
+                          items:
+                            type: string
+                        clientMedia:
+                          type: object
+                          properties:
+                            images:
+                              type: object
+                              properties:
+                                small:
+                                  type: object
+                                  properties:
+                                    size:
+                                      type: object
+                                      properties:
+                                        width:
+                                          type: string
+                                        height:
+                                          type: string
+                                    url:
+                                      type: string
+                                # Add other image types (tiled, original, large, medium, ocr) here
+                        '@id':
+                          type: string
+                        lastModified:
+                          type: string
+                          format: date-time
+                        fileFormat:
+                          type: string
+                        identifier:
+                          type: array
+                          items:
+                            type: string
+                        image:
+                          type: object
+                          properties:
+                            '@id':
+                              type: string
+                        license:
+                          type: object
+                          properties:
+                            '@id':
+                              type: string
+                        material:
+                          type: string
+                        subjects:
+                          type: array
+                          items:
+                            type: object
+                            properties:
+                              name:
+                                type: string
+                              '@id':
+                                type: string
+                        name:
+                          type: string
+                        publisher:
+                          type: object
+                          properties:
+                            name:
+                              type: string
+                        associatedMedia:
+                          type: object
+                          properties:
+                            '@id':
+                              type: string
+                        isPartOf:
+                          type: array
+                          items:
+                            type: object
+                            properties:
+                              '@id':
+                                type: string
+                  '@id':
+                    type: string
+    post:
+      tags:
+        - item
+      summary: Search for items by keyword
+      description: Search for items by keyword
+      parameters:
+        - name: itemId
+          in: path
+          description: ID of item
+          required: true
+          schema:
+            type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                text:
+                  type: string
+                textFields:
+                  type: array
+                  items:
+                    type: string
+                limit:
+                  type: integer
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  total:
+                    type: object
+                    properties:
+                      value:
+                        type: integer
+                      relation:
+                        type: string
+                  offset:
+                    type: integer
+                  limit:
+                    type: integer
+                  results:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        "@graph":
+                          type: array
+                          items:
+                            type: object
+                            properties:
+                              identifier:
+                                type: array
+                                items:
+                                  type: string
+                              image:
+                                type: object
+                                properties:
+                                  "@id":
+                                    type: string
+                              creator:
+                                type: object
+                                properties:
+                                  name:
+                                    type: string
+                              "@type":
+                                type: array
+                                items:
+                                  type: string
+                              subjects:
+                                type: array
+                                items:
+                                  type: object
+                                  properties:
+                                    "@id":
+                                      type: string
+                              yearPublished:
+                                type: integer
+                              associatedMedia:
+                                type: array
+                                items:
+                                  type: object
+                                  properties:
+                                    "@id":
+                                      type: string
+                              isPartOf:
+                                type: object
+                                properties:
+                                  "@id":
+                                    type: string
+                              datePublished:
+                                type: string
+                              license:
+                                type: object
+                                properties:
+                                  "@id":
+                                    type: string
+                              name:
+                                type: string
+                              publisher:
+                                type: object
+                                properties:
+                                  name:
+                                    type: string
+                              "@id":
+                                type: string
+                              lastModified:
+                                type: string
+                        "@id":
+                          type: string
+                        "_score":
+                          type: number
+                  aggregations:
+                    type: object
+                    properties:
+                      facets:
+                        type: object
+                        additionalProperties:
+                          type: object
+                          additionalProperties:
+                            type: integer
+                      ranges:
+                        type: object
+                        additionalProperties:
+                          type: object
+                          properties:
+                            min:
+                              type: integer
+                            max:
+                              type: integer

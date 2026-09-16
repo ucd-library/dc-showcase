@@ -1,0 +1,50 @@
+{
+  "/vocab/InC/1.0/" : {
+    "label" : "In Copyright",
+    "url" : "https://rightsstatements.org/vocab/InC/1.0/"
+  },
+  "/vocab/InC-OW-EU/1.0/" : {
+    "label" : "In Copyright - EU Orphan Work",
+    "url" : "https://rightsstatements.org/vocab/InC-OW-EU/1.0/"
+  },
+  "/vocab/InC-EDU/1.0/" : {
+    "label" : "In Copyright - Educational Use Permitted",
+    "url" : "https://rightsstatements.org/vocab/InC-EDU/1.0/"
+  },
+  "/vocab/InC-NC/1.0/" : {
+    "label" : "In Copyright - Non-Commercial Use Permitted",
+    "url" : "https://rightsstatements.org/vocab/InC-NC/1.0/"
+  },
+  "/vocab/InC-RUU/1.0/" : {
+    "label" : "In Copyright - Rights Holder(s) Unlocatable or Unidentifiable",
+    "url" : "https://rightsstatements.org/vocab/InC-RUU/1.0/"
+  },
+  "/vocab/NoC-CR/1.0/" : {
+    "label" : "No Copyright - Contractual Restrictions",
+    "url" : "https://rightsstatements.org/vocab/NoC-CR/1.0/"
+  },
+  "/vocab/NoC-NC/1.0/" : {
+    "label" : "No Copyright - Non-Commercial Use Only",
+    "url" : "https://rightsstatements.org/vocab/NoC-NC/1.0/"
+  },
+  "/vocab/NoC-OKLR/1.0/" : {
+    "label" : "No Copyright - Other Known Legal Restrictions",
+    "url" : "https://rightsstatements.org/vocab/NoC-OKLR/1.0/"
+  },
+  "/vocab/NoC-US/1.0/" : {
+    "label" : "No Copyright - United States",
+    "url" : "https://rightsstatements.org/vocab/NoC-US/1.0/"
+  },
+  "/vocab/CNE/1.0/" : {
+    "label" : "Copyright Not Evaluated",
+    "url" : "https://rightsstatements.org/vocab/CNE/1.0/"
+  },
+  "/vocab/UND/1.0/" : {
+    "label" : "Copyright Undetermined",
+    "url" : "https://rightsstatements.org/vocab/UND/1.0/"
+  },
+  "/vocab/NKC/1.0/" : {
+    "label" : "No Known Copyright",
+    "url" : "https://rightsstatements.org/vocab/NKC/1.0/"
+  }
+}

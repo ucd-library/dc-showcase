@@ -1,0 +1,129 @@
+{
+  "dynamic": false,
+
+  "properties" : {
+
+    "@id" : {
+      "type" : "keyword"
+    },
+
+    "@graph.@id" : {
+      "type" : "keyword"
+    },
+
+    "@graph.identifier" : {
+      "type" : "text",
+      "fields": {
+        "raw": { 
+          "type":  "keyword"
+        }
+      }
+    },
+
+    "@graph.subjects.@id" : {
+      "type" : "keyword"
+    },
+
+    "@graph.subjects.name" : {
+      "type" : "keyword",
+      "fields": {
+        "text": { 
+          "type":  "text"
+        }
+      }
+    },
+    
+    "@graph.yearPublished" : {
+      "type" : "integer"
+    },
+
+    "@graph.lastModified" : {
+      "type" : "date"
+    },
+
+    "name" : {
+      "type" : "keyword",
+      "fields": {
+        "text": { 
+          "type":  "text"
+        }
+      }
+    },
+
+    "@graph.name": {
+      "type": "text",
+      "fields": {
+        "raw": {
+          "type": "keyword"
+        },
+        "stem": {
+          "type": "text",
+          "analyzer": "english"
+        }
+      }
+    },
+
+    "@graph.description" : {
+      "type": "text",
+      "fields": {
+        "stem": { "type": "text", "analyzer": "english" }
+      }
+    },
+
+    "@graph.about" : {
+      "type": "text",
+      "fields": {
+        "stem": { "type": "text", "analyzer": "english" }
+      }
+    },
+
+    "@graph.keywords" : {
+      "type": "text",
+      "fields": {
+        "stem": { "type": "text", "analyzer": "english" }
+      }
+    },
+
+    "@graph.itemCount" : {
+      "type": "integer"
+    },
+
+    "@graph.coverage" : {
+      "type":  "keyword"
+    },
+
+    "@graph.creators" : {
+      "type": "text",
+      "fields": {
+        "raw": { 
+          "type":  "keyword"
+        }
+      }
+    },
+
+    "@graph.material" : {
+      "type": "text"
+    },
+
+    "@graph.location" : {
+      "type": "text"
+    },
+
+    "@graph.inLanguage.@id" : {
+      "type" : "keyword"
+    },
+
+    "@graph.inLanguage.name" : {
+      "type" : "keyword"
+    },
+
+    "@graph._.updated" : {
+      "type" : "date"
+    },
+
+    "roles" : {
+      "type":  "keyword"
+    }
+
+  }
+}

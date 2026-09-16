@@ -1,0 +1,240 @@
+tags:
+  - name: collection
+    description: Collection Information
+paths:
+  /api/collection/{collectionId}:
+    get:
+      tags:
+        - collection
+      summary: Get collection information by id
+      description: Get collection information by id
+      parameters:
+        - name: collectionId
+          in: path
+          description: ID of collection
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  '@graph':
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        '@type':
+                          type: array
+                          items:
+                            type: string
+                        clientMedia:
+                          type: object
+                        '@id':
+                          type: string
+                        lastModified:
+                          type: string
+                          format: date-time
+                        image:
+                          type: object
+                          properties:
+                            '@id':
+                              type: string
+                        identifier:
+                          type: string
+                        subjects:
+                          type: array
+                          items:
+                            type: object
+                            properties:
+                              name:
+                                type: string
+                              '@id':
+                                type: string
+                        description:
+                          type: string
+                        yearPublished:
+                          type: integer
+                        isPartOf:
+                          type: object
+                          properties:
+                            '@id':
+                              type: string
+                        itemCount:
+                          type: integer
+                        datePublished:
+                          type: string
+                        license:
+                          type: object
+                          properties:
+                            '@id':
+                              type: string
+                        name:
+                          type: string
+                        publisher:
+                          type: array
+                          items:
+                            type: object
+                            properties:
+                              name:
+                                type: string
+                              '@id':
+                                type: string
+                  name:
+                    type: string
+                  '@id':
+                    type: string
+    post:
+      tags:
+        - collection
+      summary: Search for collections by keyword
+      description: Search for collections by keyword
+      parameters:
+        - name: collectionId
+          in: path
+          description: ID of collection
+          required: true
+          schema:
+            type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                text:
+                  type: string
+                textFields:
+                  type: array
+                  items:
+                    type: string
+                limit:
+                  type: integer
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  total:
+                    type: object
+                    properties:
+                      value:
+                        type: integer
+                      relation:
+                        type: string
+                  limit:
+                    type: integer
+                  results:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        "@graph":
+                          type: array
+                          items:
+                            type: object
+                            properties:
+                              image:
+                                type: object
+                                properties:
+                                  "@id":
+                                    type: string
+                              identifier:
+                                type: string
+                              "@type":
+                                type: array
+                                items:
+                                  type: string
+                              subjects:
+                                type: object
+                                properties:
+                                  "@id":
+                                    type: string
+                              description:
+                                type: string
+                              yearPublished:
+                                type: integer
+                              itemCount:
+                                type: integer
+                              datePublished:
+                                type: string
+                              license:
+                                type: object
+                                properties:
+                                  "@id":
+                                    type: string
+                              name:
+                                type: string
+                              clientMedia:
+                                type: object
+                              publisher:
+                                type: array
+                                items:
+                                  type: object
+                                  properties:
+                                    "@id":
+                                      type: string
+                                    name:
+                                      type: string
+                              "@id":
+                                type: string
+                              lastModified:
+                                type: string
+                        name:
+                          type: string
+                        "@id":
+                          type: string
+                        "_score":
+                          type: number
+                  aggregations:
+                    type: object
+                    properties:
+                      facets:
+                        type: object
+                      ranges:
+                        type: object
+  /api/collection/edits/collection/{collectionId}:
+    get:
+      tags:
+        - collection
+      summary: Find item and collection edits for a collection by id
+      description: Returns admin preferences overrides for item and collection edits for a collection by id
+      parameters:
+        - name: collectionId
+          in: path
+          description: ID of collection
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  collection:
+                    type: string
+                    description: Fedora collection information
+                  edits:
+                    type: string
+                    description: Fedora application edits information, showing if the collection has edits
+                  itemOverrides:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        item:
+                          type: string
+                          description: Fedora item information
+                        item_default_display:
+                          type: string
+                          description: Default display for the item, showing if the item has edits

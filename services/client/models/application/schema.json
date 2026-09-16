@@ -1,0 +1,22 @@
+{
+  "dynamic": false,
+
+  "properties" : {
+
+    "@graph.@id" : {
+      "type" : "keyword"
+    },
+
+    "@graph.applicationId" : {
+      "type" : "keyword"
+    },
+
+    "@graph.identifier" : {
+      "type":  "keyword"
+    },
+
+    "@graph.name" : {
+      "type" : "keyword"
+    }
+  }
+}

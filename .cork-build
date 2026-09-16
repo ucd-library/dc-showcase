@@ -1,0 +1,23 @@
+{
+  "registry" : "us-west1-docker.pkg.dev/argonath-508815/pub",
+
+  "repositories" : {},
+
+  "images" : {
+    "dcs-gateway" : {
+      "contextPath" : "services/gateway"
+    },
+    "dcs-client" : {
+      "contextPath" : "services/client"
+    },
+    "dcs-init" : {
+      "contextPath" : "services/init"
+    },
+    "dcs-iipimage-server" : {
+      "contextPath" : "services/iipimage"
+    },
+    "dcs-elastic-search" : {
+      "contextPath" : "services/elastic-search"
+    }
+  }
+}

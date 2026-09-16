@@ -1,0 +1,40 @@
+{
+  "dynamic": false,
+
+  "properties" : {
+
+    "@id" : {
+      "type" : "keyword"
+    },
+
+    "@graph.@id" : {
+      "type" : "keyword"
+    },
+
+    "@graph.identifier" : {
+      "type" : "keyword"
+    },
+
+    "@graph.encodesCreativeWork" : {
+      "type" : "keyword"
+    },
+
+    "@graph.position" : {
+      "type" : "integer"
+    },
+
+    "@graph.content" : {
+      "type" : "text",
+      "analyzer" : "djvu_xml"
+    },
+
+    "@graph._.updated" : {
+      "type" : "date"
+    },
+
+    "roles" : {
+      "type":  "keyword"
+    }
+
+  }
+}

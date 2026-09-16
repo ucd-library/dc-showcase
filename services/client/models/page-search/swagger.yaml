@@ -1,0 +1,76 @@
+tags:
+  - name: page search
+    description: Internet Archive page search
+paths:
+  /api/page-search/ia:
+    get:
+      tags:
+        - page search
+      summary: Search item by keyword
+      description: Search item by keyword
+      parameters:
+        - in: query
+          name: item_id
+          schema:
+            type: string
+          description: The item id to search
+        - in: query
+          name: q
+          schema:
+            type: string
+          description: The search term
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  ia:
+                    type: string
+                  q:
+                    type: string
+                  indexed:
+                    type: boolean
+                  matches:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        text:
+                          type: string
+                        par:
+                          type: array
+                          items:
+                            type: object
+                            properties:
+                              l:
+                                type: integer
+                              t:
+                                type: integer
+                              r:
+                                type: integer
+                              b:
+                                type: integer
+                              page:
+                                type: integer
+                              boxes:
+                                type: array
+                                items:
+                                  type: object
+                                  properties:
+                                    l:
+                                      type: integer
+                                    t:
+                                      type: integer
+                                    r:
+                                      type: integer
+                                    b:
+                                      type: integer
+                                    page:
+                                      type: integer
+                              page_width:
+                                type: integer
+                              page_height:
+                                type: integer
