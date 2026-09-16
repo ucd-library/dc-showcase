@@ -10,27 +10,19 @@ import { logger, logReqMiddleware } from './lib/logger.js';
 // dams/services/fin/models/item/transform.js
 const FCREPO_PATH_REGEX = /^\/fcrepo\/rest\/(?:item|collection)\/(ark:\/[a-z0-9]+\/[a-z0-9]+)(\/.*)?$/i;
 const GCS_PATH_REGEX = /^(.*)\/svc:gcs\/(.*)$/i;
-const IIIF_PATH_REGEX = /^(.*)]\/svc:iiif\/(.*)$/i;
+const IIIF_PATH_REGEX = /^(.*)\/svc:iiif\/(.*)$/i;
 // This is a HACK
 const IIIF_TIF_PATH = '/images/tiled.tif';
 
 const app = express();
 const proxy = httpProxy.createProxyServer({ xfwd: true });
 
-
-app.use(logReqMiddleware);
-
-// proxy.on('error', (err, req, res) => {
-//   console.error(`Proxy error for ${req.method} ${req.originalUrl}`, err);
-//   if( !res.headersSent ) {
-//     res.status(502).send('Bad gateway');
-//   }
-// });
+app.use(logReqMiddleware(logger));
 
 // TODO: any fcrepo/rest path should check access first.
 
 app.use(async (req, res, next) => {
-  if( !req.path.startsWith(config.IIIF_PATH_REGEX) ) {
+  if( !IIIF_PATH_REGEX.test(req.path) ) {
     return next();
   }
 
@@ -38,16 +30,16 @@ app.use(async (req, res, next) => {
   let caskPath = [config.caskfs.goldBasePath, parts[0], IIIF_TIF_PATH].join('');
   let metadata = await caskClient.getFileMetadata(caskPath);
   let iiifQuery = parts[1].replace(IIIF_TIF_PATH, '');
+  let casPath = caskClient.casRelativePath(metadata.hash_value);
 
-
-  req.url = metadata.fullPath + iiifQuery;
+  req.url = config.iiif.basePath + casPath + iiifQuery;
   logger.debug(`Rewriting ${req.path} -> ${req.url} to ${config.iiif.url} for IIIF request`);
   proxy.web(req, res, { target: config.iiif.url });
 });
 
 
 app.use(async (req, res, next) => {
-  if( !req.path.startsWith(config.GCS_PATH_REGEX) ) {
+  if( !GCS_PATH_REGEX.test(req.path) ) {
     return next();
   }
 
@@ -55,9 +47,9 @@ app.use(async (req, res, next) => {
   // subpath still has old bucket name
   subPath = subPath.split('/').slice(1).join('/');
 
-  req.url = itemPath + subPath;
+  req.url = '/api/fs' + itemPath + subPath;
   logger.debug(`Rewriting ${req.path} -> ${req.url} to ${config.caskfs.url} for GCS request`);
-  proxy.web(req, res, { target: config.caskfs.url });
+  proxy.web(req, res, { target: config.caskfs.url, headers: caskClient.authHeaders() });
 });
 
 
@@ -72,9 +64,9 @@ app.use(async (req, res, next) => {
 
   let caskPath = req.path.replace('/fcrepo/rest', '');
 
-  req.url = caskPath;
+  req.url = '/api/fs' + caskPath;
   logger.debug(`Rewriting ${req.path} -> ${req.url} to ${config.caskfs.url} for fcrepo request`);
-  proxy.web(req, res, { target: config.caskfs.url });
+  proxy.web(req, res, { target: config.caskfs.url, headers: caskClient.authHeaders() });
 });
 
 

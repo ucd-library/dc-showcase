@@ -1,10 +1,5 @@
-ARG FIN_INIT
-FROM ${FIN_INIT}
+FROM alpine:3.18.4
 
-COPY fcrepo /etc/ucdlib-service-init/fcrepo-dams
-COPY postgres /etc/ucdlib-service-init/postgres-dams
+COPY postgres /opt/init/postgres
 
-COPY init-dams.sh /init-dams.sh
-RUN chmod +x /init-dams.sh
-
-CMD ["/init-dams.sh"]
+# CMD ["/init-dams.sh"]

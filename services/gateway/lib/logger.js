@@ -1,8 +1,8 @@
-const { createLogger, logReqMiddleware } = require('@ucd-lib/logger');
+import { createLogger, logReqMiddleware } from '@ucd-lib/logger';
 
 const logger = createLogger({
   name: 'dcs-gateway',
   noInitMsg: true
 });
 
-module.exports = { logger, logReqMiddleware, createLogger };
+export { logger, logReqMiddleware, createLogger };

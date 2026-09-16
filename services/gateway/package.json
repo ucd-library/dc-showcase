@@ -12,6 +12,7 @@
   "license": "MIT",
   "description": "Inspects requests to the Digital Collections Showcase site and routes them to either the fin/Fedora backend or directly out of caskfs.",
   "dependencies": {
+    "@ucd-lib/logger": "^0.0.7",
     "dotenv": "^16.4.7",
     "express": "^4.21.2",
     "http-proxy": "^1.18.1",

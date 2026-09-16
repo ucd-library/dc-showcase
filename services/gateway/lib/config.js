@@ -21,7 +21,7 @@ const config = {
   port : env.PORT || 3000,
 
   client : {
-    url : env.CLIENT_URL || 'http://client:3000',
+    url : env.CLIENT_URL || 'http://client:8000',
   },
 
   iiif : {
@@ -40,7 +40,11 @@ const config = {
 
     goldBasePath : env.CASKFS_GOLD_BASE_PATH || '/gold/dc-showcase',
 
-    rootDir : env.CASKFS_ROOT_DIR || '/opt/caskfs',
+    rootDir : env.CASKFS_ROOT_DIR || '/opt/cask',
+
+    // trusted identity presented via the x-anduin-user header when calling
+    // caskfs (CASKFS_HEADER_AUTH_ENABLED=true) - see lib/cask-client.js#authHeaders()
+    user : env.CASKFS_USER || '',
   }
 
 }
