@@ -28,6 +28,12 @@ app.get('/health', (req, res) => res.status(200).send('ok'));
 
 async function main() {
   /**
+   * ensure <model>-read / <model>-write ES aliases exist for every
+   * ES-backed data model before any route that queries them is mounted
+   */
+  await require('./lib/es-index-init.js')();
+
+  /**
    * mount data model APIs at /api/<name> (single process - see
    * docs/PORT-PLAN.md Phase 0)
    */
@@ -47,7 +53,7 @@ async function main() {
    * fcrepo-middleware shim: resolves legacy /fcrepo/rest/... URLs against
    * CaskFS - see docs/PORT-PLAN.md Phase 2
    */
-  app.use(require('./lib/fcrepo-middeware.js'));
+  // app.use(require('./lib/fcrepo-middeware.js'));
 
   /**
    * setup static routes

@@ -17,9 +17,25 @@ const IIIF_TIF_PATH = '/images/tiled.tif';
 const app = express();
 const proxy = httpProxy.createProxyServer({ xfwd: true });
 
+proxy.on('error', (err, req, res) => {
+  logger.error(`Proxy error for ${req.url}: ${err.message}`);
+  res.status(500).send('Proxy error');
+});
+
 app.use(logReqMiddleware(logger));
 
 // TODO: any fcrepo/rest path should check access first.
+
+app.use(async (req, res, next) => {
+  if( !req.path.startsWith('/cask/') ) {
+    return next();
+  }
+
+  let caskPath = req.path.replace('/cask', '');
+  req.url = '/api/fs' + caskPath;
+  logger.debug(`Rewriting ${req.path} -> ${req.url} to ${config.caskfs.url} for CaskFS request`);
+  proxy.web(req, res, { target: config.caskfs.url, headers: caskClient.authHeaders() });
+});
 
 app.use(async (req, res, next) => {
   if( !IIIF_PATH_REGEX.test(req.path) ) {
@@ -75,5 +91,5 @@ app.use((req, res) => {
 });
 
 app.listen(config.port, () => {
-  console.log(`DAMS router listening on port ${config.port}`);
+  logger.info(`Digital Collections Showcase router listening on port ${config.port}`);
 });

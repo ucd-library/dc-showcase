@@ -4,6 +4,9 @@ FROM node:22-bookworm
 
 ENV DEBIAN_FRONTEND=noninteractive
 
+RUN apt update && apt install -y \
+  vim
+
 WORKDIR /app
 
 COPY package.json .

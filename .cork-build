@@ -17,7 +17,8 @@
       "contextPath" : "services/iipimage"
     },
     "dcs-elastic-search" : {
-      "contextPath" : "services/elastic-search"
+      "contextPath" : "services/elastic-search",
+      "user" : "elasticsearch"
     }
   }
 }

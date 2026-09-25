@@ -1,5 +1,8 @@
 FROM node:22
 
+RUN apt update && apt install -y \
+  vim
+
 RUN mkdir /service
 WORKDIR /service
 
