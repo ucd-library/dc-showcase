@@ -35,6 +35,7 @@ export default class AppMediaViewer extends Mixin(LitElement)
       bookItemId: { type: String },
       itemId: { type: String },
       isBookReader: { type: Boolean },
+      bookTitle: { type: String },
       searchResults: { type: Array },
       searchResultsCount: { type: Number },
       selectedResult: { type: Number },
@@ -64,6 +65,7 @@ export default class AppMediaViewer extends Mixin(LitElement)
     this.bookItemId = "";
     this.itemId = "";
     this.isBookReader = false;
+    this.bookTitle = '';
     this.overrideImageList = false;
     this.searchResults = [];
     this.searchResultsCount = 0;
@@ -119,6 +121,7 @@ export default class AppMediaViewer extends Mixin(LitElement)
 
     // check for any overrides at collection/item level for the image viewer
     this.itemId = e.selectedRecord?.graph?.root?.['@id'];
+    this.bookTitle = e.selectedRecord?.graph?.root?.name || '';
     let collectionId = e.selectedRecord?.graph?.root?.isPartOf?.filter(p => p['@id'].includes('/collection/'))?.[0]?.['@id'];
     let displayType = await this._getItemDisplayType(this.itemId, collectionId);
 
@@ -164,7 +167,7 @@ export default class AppMediaViewer extends Mixin(LitElement)
       if( selectedMediaGroup ){
         mediaType = 'image';
         let hasPdf = mediaGroups.filter(m => m.clientMedia?.pdf);
-        // if( hasPdf.length ) renderAsBr = true;
+        if( hasPdf.length ) renderAsBr = true;
       }
 
       if( !selectedMediaGroup ) {

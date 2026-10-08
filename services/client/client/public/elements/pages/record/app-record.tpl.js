@@ -128,16 +128,17 @@ export default function render() {
         margin: auto 0;
       }
 
-      .part-of .collection-info h4 {
+      .part-of .collection-info h2 {
         margin: 0.3rem 0 0;
         font-weight: 600;
+        font-size: 1.5rem;
       }
 
-      .part-of .collection-info h4 a {
+      .part-of .collection-info h2 a {
         color: var(--color-aggie-blue);
         text-decoration: none;
       }
-      .part-of .collection-info h4 a:hover {
+      .part-of .collection-info h2 a:hover {
         text-decoration: underline;
       }
 
@@ -167,7 +168,7 @@ export default function render() {
 
       @media (max-width: 600px) {
         .container {
-          width: 95%;
+          width: 90%;
         }
 
         .metadata-row,
@@ -187,7 +188,7 @@ export default function render() {
           margin: 2rem 1.5rem 2rem 1rem;
         }
 
-        .part-of .collection-info h4 {
+        .part-of .collection-info h2 {
           font-weight: 800;
           font-size: 1.2rem;
           margin: 0;
@@ -444,7 +445,7 @@ export default function render() {
 
     <app-media-viewer></app-media-viewer>
 
-    <div class="container" style="padding-bottom: 50px;">
+    <div class="container" style="padding-bottom: 50px;" role="region" aria-label="Item metadata">
       ${this.name
         ? html`<h1>${this.name}</h1>`
         : html``
@@ -461,7 +462,7 @@ export default function render() {
         <div class="collection-info">
           <p style="font-style: italic;">part of digital collection</p>
           ${this.collectionId && this.collectionName
-            ? html`<h4><a href="${this.collectionId}">${this.collectionName}</a></h4>`
+            ? html`<h2><a href="${this.collectionId}">${this.collectionName}</a></h2>`
             : html``
           }
           <span>${this.collectionItemCount} items</span>
@@ -482,7 +483,9 @@ export default function render() {
 
       <div ?hidden="${!this.date}" class="metadata-row">
         <div class="attr">Date</div>
-        <div class="value" id="dateValue">${this.date}</div>
+        <div class="value" id="dateValue">
+          ${this.date}
+        </div>
       </div>
 
       <div ?hidden="${!this.description || !this.description.length}" class="metadata-row">

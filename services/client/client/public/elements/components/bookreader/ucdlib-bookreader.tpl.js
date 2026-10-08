@@ -79,8 +79,12 @@ export function render() {
 return html`
 
   <div id="page-container">
-    <div id="single-page" 
-      ?fullscreen="${this.fullscreen}" 
+    <div id="single-page"
+      ?fullscreen="${this.fullscreen}"
+      tabindex="0"
+      role="group"
+      aria-roledescription="book"
+      aria-label="${this.title ? this.title + ', book page viewer' : 'Book page viewer'}"
       >
       <div id="single-page-scroll"></div>
     </div>

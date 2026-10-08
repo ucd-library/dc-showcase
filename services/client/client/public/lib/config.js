@@ -38,7 +38,19 @@ config.elasticSearch = {
         return 'Subject: '+value;
       }
     },
-    '@graph.yearPublished' : {
+    // yearPublishedStart/yearPublishedEnd need to be backfilled by reindexing before search
+    // can rely on them, so this facet queries the legacy scalar yearPublished field until
+    // APP_CONFIG.useDateRangeFields is flipped on (see services/fin/ucd-lib-client/config.js).
+    // 'type' is the ui widget type and stays 'range' either way, so app-range-filter renders;
+    // 'esType'/'startField'/'endField' (consumed by ElasticSearchModel) are what actually
+    // changes which field(s) get queried.
+    '@graph.yearPublished' : APP_CONFIG.useDateRangeFields ? {
+      label : 'Date',
+      type : 'range',
+      esType : 'range-overlap',
+      startField : '@graph.yearPublishedStart',
+      endField : '@graph.yearPublishedEnd'
+    } : {
       label : 'Date',
       type : 'range'
     }
