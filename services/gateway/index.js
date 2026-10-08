@@ -31,7 +31,7 @@ app.use(async (req, res, next) => {
     return next();
   }
 
-  let caskPath = req.path.replace('/cask', '');
+  let caskPath = req.path.replace(/^\/cask(\/file)?/, '');
   req.url = '/api/fs' + caskPath;
   logger.debug(`Rewriting ${req.path} -> ${req.url} to ${config.caskfs.url} for CaskFS request`);
   proxy.web(req, res, { target: config.caskfs.url, headers: caskClient.authHeaders() });
