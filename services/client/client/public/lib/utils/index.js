@@ -151,7 +151,10 @@ class Utils {
       }
     }
 
-    if( isAudioVideo && rootImage ) thumbnailUrl = rootImage;
+    if( isAudioVideo && rootImage ) {
+      let imageNode = graph.find(g => g['@id'] === rootImage);
+      thumbnailUrl = imageNode?.clientMedia?.images?.medium?.url || thumbnailUrl;
+    }
 
     return thumbnailUrl;
   }
