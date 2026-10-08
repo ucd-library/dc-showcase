@@ -217,7 +217,7 @@ export default class AppImageViewer extends Mixin(LitElement).with(
     }
 
     if (this.renderedMedia.tiled) {
-      let tiledUrl = this.renderedMedia.tiled.iiif + "/info.json";
+      let tiledUrl = this.renderedMedia.tiled.iiif + "/-/info.json";
       this.currentLayer = L.tileLayer.iiif(tiledUrl);
       this.currentLayer.getTileUrl = function(coords) {
         var _this = this,

@@ -11,7 +11,7 @@ import { init as initAuthMiddleware } from './controllers/auth.js';
 // dams/services/fin/models/item/transform.js
 const FCREPO_PATH_REGEX = /^\/fcrepo\/rest\/(?:item|collection)\/(ark:\/[a-z0-9]+\/[a-z0-9]+)(\/.*)?$/i;
 const GCS_PATH_REGEX = /^(.*)\/svc:gcs\/(.*)$/i;
-const IIIF_PATH_REGEX = /^(.*)\/svc:iiif\/(.*)$/i;
+const IIIF_PATH_REGEX = /^\/iiif\/(.*)$/i;
 // This is a HACK
 const IIIF_TIF_PATH = '/images/tiled.tif';
 
@@ -53,14 +53,22 @@ app.use(async (req, res, next) => {
     return next();
   }
 
-  let parts = req.path.replace('/fcrepo/rest', '').split('/svc:iiif/');
-  let caskPath = [config.caskfs.goldBasePath, parts[0], IIIF_TIF_PATH].join('');
-  let metadata = await caskClient.getFileMetadata(caskPath);
-  let iiifQuery = parts[1].replace(IIIF_TIF_PATH, '');
+  let parts = req.path.split(/\/-\/.*$/);
+  let caskPath = parts[0].replace('/iiif', '');
+  let metadata;
+  try {
+    metadata = await caskClient.getFileMetadata(caskPath);
+  } catch (err) {
+    logger.error(`Error fetching metadata for ${caskPath}: ${err.message}`);
+    return res.status(500).send('Error finding cask file for IIIF request');
+  }
+  console.log('metadata', metadata);
+  let iiifQuery = parts[1];
   let casPath = caskClient.casRelativePath(metadata.hash_value);
+  console.log('casPath', casPath, 'iiifQuery', iiifQuery);
 
   req.url = config.iiif.basePath + casPath + iiifQuery;
-  logger.debug(`Rewriting ${req.path} -> ${req.url} to ${config.iiif.url} for IIIF request`);
+  logger.info(`Rewriting ${req.path} -> ${req.url} to ${config.iiif.url} for IIIF request`);
   proxy.web(req, res, { target: config.iiif.url });
 });
 
