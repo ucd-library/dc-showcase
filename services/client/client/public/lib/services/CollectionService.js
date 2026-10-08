@@ -35,7 +35,7 @@ class CollectionService extends BaseService {
 
   getDisplayData(id) {
     return this.request({
-      url : '/fcrepo/rest/application/ucd-lib-client'+id,
+      url : '/application/ucd-lib-client'+id,
       fetchOptions : {
         headers : {
           'Accept' : 'application/ld+json',
@@ -52,7 +52,7 @@ class CollectionService extends BaseService {
 
   saveDisplayData(id, displayData) {
     return this.request({
-      url : '/fcrepo/rest/application/ucd-lib-client'+id,
+      url : '/application/ucd-lib-client'+id,
       fetchOptions : {
         method : 'PUT',
         headers : {

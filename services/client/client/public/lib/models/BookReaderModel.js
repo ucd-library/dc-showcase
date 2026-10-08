@@ -189,6 +189,12 @@ class BookReaderModel extends BaseModel {
         {id, payload: imageList.clientMedia.pages, state: this.store.STATE.LOADED, src: imageList}, 
         this.store.data.bookManifest
       );
+    } else if( pdf?.clientMedia?.pages?.length ) {
+      // argonath-indexed pdfs embed their pages on the node, no manifest fetch
+      this.store.set(
+        {id, payload: pdf.clientMedia.pages, state: this.store.STATE.LOADED, src: pdf},
+        this.store.data.bookManifest
+      );
     } else if( pdf ) {
       await this.service.loadPdfManifest(id, pdf);
     } else {

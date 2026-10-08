@@ -135,7 +135,7 @@ class Utils {
 
       let mediaType = this.getMediaType(mediaGroup);
       if (mediaType === "ImageObject") {
-        thumbnailUrl = "/fcrepo/rest" + mediaGroup["@id"];
+        thumbnailUrl = mediaGroup["@id"];
       } else if (mediaType === "ImageList") {
         let firstImage = graph.filter(
           (g) => parseInt(g.position) === 1 && g.clientMedia
@@ -146,7 +146,7 @@ class Utils {
         // pull image from root node if exists
         let rootNode = graph.filter((g) => g["@id"] === clientMedia["id"])[0];
         if (rootNode) {
-          rootImage = "/fcrepo/rest" + rootNode.image?.["@id"];
+          rootImage = rootNode.image?.["@id"];
         }
       }
     }

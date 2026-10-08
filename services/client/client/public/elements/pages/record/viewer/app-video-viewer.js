@@ -166,7 +166,7 @@ export default class AppVideoViewer extends Mixin(LitElement)
     if( !this.media ) return;
 
     let mediaType = utils.getMediaType(this.media);
-    let manifestUri = config.fcrepoBasePath+this.media['@id'];
+    let manifestUri = this.media['@id'];
 
     if( this.media.clientMedia?.streamingVideo?.manifest ) {
       manifestUri = this.media.clientMedia.streamingVideo.manifest;

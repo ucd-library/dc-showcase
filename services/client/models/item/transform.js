@@ -411,8 +411,6 @@ function getGatewayUrl(url='') {
   if( url.startsWith('http') ) {
     url = new URL(url);
     return config.gateway.host+url.pathname+url.search;
-  } else if( url.startsWith('/fcrepo/rest') ) {
-    return config.gateway.host+url;
   }
-  return config.gateway.host+'/fcrepo/rest'+url;
+  return config.gateway.host+url;
 }

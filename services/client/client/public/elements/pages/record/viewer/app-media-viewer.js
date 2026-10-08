@@ -164,7 +164,7 @@ export default class AppMediaViewer extends Mixin(LitElement)
       if( selectedMediaGroup ){
         mediaType = 'image';
         let hasPdf = mediaGroups.filter(m => m.clientMedia?.pdf);
-        if( hasPdf.length ) renderAsBr = true;
+        // if( hasPdf.length ) renderAsBr = true;
       }
 
       if( !selectedMediaGroup ) {
@@ -220,6 +220,11 @@ export default class AppMediaViewer extends Mixin(LitElement)
     if( renderAsBr && this.isMultimedia && mediaType === 'bookreader' ) {
       // if multimedia with bookreader, and display type is bookreader,
       // then override to image viewer to show imagelist instead
+      renderAsBr = false;
+      mediaType = 'image';
+    }
+
+    if( selectedMediaGroup.id === '/item/ark:/87293/9191/images' ) {
       renderAsBr = false;
       mediaType = 'image';
     }

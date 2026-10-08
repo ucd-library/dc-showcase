@@ -8,13 +8,12 @@ class FcAppConfigService extends BaseService {
     super();
     this.store = FcAppConfigStore;
 
-    this.baseFcrepoUrl = '/fcrepo/rest/application/ucd-lib-client';
     this.baseApiUrl = '/api/application/ucd-lib-client';
   }
 
   getDefaultImagesConfig() {
     return this.request({
-      url : `${this.baseFcrepoUrl}/default-images/config.json`,
+      url : `${this.baseApiUrl}/default-images/config.json`,
       checkCached : () => this.store.data.defaultImages,
       onLoading : request => this.store.setDefaultImagesConfigLoading(request),
       onLoad : config => this.store.setDefaultImagesConfig(config),
@@ -44,7 +43,7 @@ class FcAppConfigService extends BaseService {
 
   getCollectionAppData(id) {
     return this.request({
-      url : `${this.baseFcrepoUrl}${id}`,
+      url : `${this.baseApiUrl}${id}`,
       fetchOptions : {
         headers : {
           'Accept' : 'application/ld+json',
@@ -61,7 +60,7 @@ class FcAppConfigService extends BaseService {
 
   getItemAppData(id) {
     return this.request({
-      url : `${this.baseFcrepoUrl}${id}`,
+      url : `${this.baseApiUrl}${id}`,
       fetchOptions : {
         headers : {
           'Accept' : 'application/ld+json',
@@ -78,7 +77,7 @@ class FcAppConfigService extends BaseService {
 
   async saveCollectionDisplayData(id, displayData) {    
     return this.request({
-      url : `${this.baseFcrepoUrl}${id}`,
+      url : `${this.baseApiUrl}${id}`,
       fetchOptions : {
         method : 'PUT',
         headers : {
@@ -95,7 +94,7 @@ class FcAppConfigService extends BaseService {
 
   async saveCollectionFeaturedImage(id, featuredImage) {
     if( featuredImage ) {
-      await fetch(`${this.baseFcrepoUrl}${id}/featuredImage.jpg`, {
+      await fetch(`${this.baseApiUrl}${id}/featuredImage.jpg`, {
         method : 'PUT',
         headers : {
             'Content-Type' : 'image/jpg',
@@ -108,7 +107,7 @@ class FcAppConfigService extends BaseService {
 
   getFeaturedCollectionAppData() {
     return this.request({
-      url : `${this.baseFcrepoUrl}/featured-collections/config.json`,
+      url : `${this.baseApiUrl}/featured-collections/config.json`,
       checkCached : () => null,
       onLoading : null,
       onLoad : null,
@@ -118,7 +117,7 @@ class FcAppConfigService extends BaseService {
 
   async saveFeaturedCollectionDisplayData(displayData) {
     return this.request({
-      url : `${this.baseFcrepoUrl}/featured-collections/config.json`,
+      url : `${this.baseApiUrl}/featured-collections/config.json`,
       fetchOptions : {
         method : 'PUT',
         headers : {
@@ -137,7 +136,7 @@ class FcAppConfigService extends BaseService {
 
   async saveItemDisplayData(id, displayData) {
     return this.request({
-      url : `${this.baseFcrepoUrl}${id}`,
+      url : `${this.baseApiUrl}${id}`,
       fetchOptions : {
         method : 'PUT',
         headers : {

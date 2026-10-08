@@ -40,7 +40,7 @@ export default class AppSearchResult extends Mixin(LitElement)
     this.tabindex = 0;
 
     this._injectModel('AppStateModel', 'CollectionModel', 'MediaModel');
-    this.baseUrl = window.location.protocol+'//'+window.location.host+'/fcrepo/rest';
+    this.baseUrl = window.location.protocol+'//'+window.location.host;
   }
 
   firstUpdated() {

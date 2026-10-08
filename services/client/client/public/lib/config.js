@@ -6,8 +6,6 @@ for( var key in rights ) {
   rightsMap[key] =  rights[key].text;
 }
 
-config.fcrepoBasePath = '/fcrepo/rest';
-
 // facets to show on left side
 config.elasticSearch = {
   facets : {

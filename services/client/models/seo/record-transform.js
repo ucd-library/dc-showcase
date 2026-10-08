@@ -43,7 +43,7 @@ function transform(jsonld, clientMedia, nestedKey) {
     if( jsonld.image['@shortType'] ) delete jsonld.image['@shortType'];
     if( jsonld.image.id ) delete jsonld.image.id;
     if( jsonld.image['@id'] ) {
-      jsonld.image.url = '/fcrepo/rest'+jsonld.image['@id'];
+      jsonld.image.url = jsonld.image['@id'];
       delete jsonld.image['@id'];
     }
   } else if( jsonld.filename || jsonld.fileSize || jsonld.fileFormat) {

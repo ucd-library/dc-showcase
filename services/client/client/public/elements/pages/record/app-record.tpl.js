@@ -151,13 +151,11 @@ export default function render() {
         color: var(--color-aggie-blue-80);
       }
 
-      #identifierValue a,
-      #fedoraValue a {
+      #identifierValue a {
         display: block;
       }
 
-      #identifierValue a:nth-child(1),
-      #fedoraValue a:nth-child(1) {
+      #identifierValue a:nth-child(1) {
         padding-bottom: 1rem;
       }
 
@@ -540,13 +538,6 @@ export default function render() {
         <div class="attr">ARK / DOI</div>
         <div class="value" id="identifierValue">
           ${this.arkDoi.map((link) => html`<a @click="${this._arkDoiClick}" href="${link}">${link.replace('/item', '')}</a>`)}
-        </div>
-      </div>
-
-      <div class="metadata-row">
-        <div class="attr">Fedora Link</div>
-        <div class="value" id="fedoraValue">
-          ${this.fedoraLinks.map((link) => html`<a href="${link}">${link.replace('/fcr:metadata', '')}</a>`)}
         </div>
       </div>
 

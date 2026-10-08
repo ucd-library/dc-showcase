@@ -41,7 +41,6 @@ class AppRecord extends Mixin(LitElement)
       metadata: { type: Array },
       isBagOfFiles: { type: Boolean },
       arkDoi: { type: Array },
-      fedoraLinks: { type: Array },
       isUiAdmin : { type : Boolean },
       editMode : { type : Boolean },
       // citations : {type: Array}
@@ -111,7 +110,6 @@ class AppRecord extends Mixin(LitElement)
     this.metadata = [];
     this.isBagOfFiles = false;
     this.arkDoi = [];
-    this.fedoraLinks = [];
     // this.citations = [];
     this.citationRoot = {};
     this.collectionItemCount = 0;
@@ -219,7 +217,7 @@ class AppRecord extends Mixin(LitElement)
     let clientEditsId = e.vcData.clientEdits?.['@id'];
     let overriddenFeatureImage =  e.vcData.clientEdits?.thumbnailUrl?.['@id'];
     if( clientEditsId && overriddenFeatureImage ) {
-      this.collectionImg = '/fcrepo/rest' + clientEditsId + '/featuredImage.jpg';
+      this.collectionImg = clientEditsId + '/featuredImage.jpg';
     } else {
       this.collectionImg = e.vcData?.images?.small?.url                   
       || e.vcData?.images?.medium?.url 
@@ -530,15 +528,8 @@ class AppRecord extends Mixin(LitElement)
 
     this.arkDoi = [
       path,
-      imagePath.replace('/fcrepo/rest', '')
+      imagePath
     ];
-
-    if( !imagePath.endsWith('/images') ) imagePath += '/fcr:metadata';
-    this.fedoraLinks = [
-      '/fcrepo/rest'+ path.replace('/fcrepo/rest', ''),
-      '/fcrepo/rest'+ imagePath.replace('/fcrepo/rest', '')
-    ];
-
   }
 
   _onSubjectClick(e) {

@@ -71,7 +71,7 @@ class ClientEditsModel {
   }
 
   cleanEditForApi(id, edits, obj={}) {
-    let nodes = edits.find(e => e['@id'].split('/fcrepo/rest/application/ucd-lib-client').pop() === id);
+    let nodes = edits.find(e => e['@id'].split('/application/ucd-lib-client').pop() === id);
     if( !nodes ) return obj;
 
     if( !Array.isArray(nodes) ) {
@@ -83,7 +83,7 @@ class ClientEditsModel {
         if( prop === '@id' ) {
           obj['@id'] = edit[prop];
           try {
-            obj['@id'] = new URL(obj['@id']).pathname.replace(/^\/fcrepo\/rest/, '');
+            obj['@id'] = new URL(obj['@id']).pathname;
           } catch(e) {}
         }
 
@@ -118,7 +118,7 @@ class ClientEditsModel {
       return prop['@value'];
     }
     if( prop['@id'] ) {
-      let obj = this.cleanEditForApi(prop['@id'].split('/fcrepo/rest/application/ucd-lib-client').pop(), edits);
+      let obj = this.cleanEditForApi(prop['@id'].split('/application/ucd-lib-client').pop(), edits);
       if( Object.keys(obj).length === 0 ) {
         return prop;
       }

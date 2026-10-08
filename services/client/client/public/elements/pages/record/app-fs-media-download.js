@@ -46,7 +46,6 @@ export default class AppFsMediaDownload extends Mixin(LitElement)
         let url = this.selectedRecordMedia.clientMediaDownload;
         if( Array.isArray(url) ) url = url[0];
         if( typeof url === 'object' ) url = url['@id'];
-        url = '/fcrepo/rest/'+url;
         open(url, '_blank');
       } else {
         let url = '/api/zip/bag-of-files'+this.selectedRecordMedia['@id'];
