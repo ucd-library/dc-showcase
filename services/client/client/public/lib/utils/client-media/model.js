@@ -116,7 +116,7 @@ class ClientMedia {
       if( !node.clientMedia.download ) {
         if( displayType !== 'imagelist' ) {
           node.clientMedia.download = [{
-            url : '/fcrepo/rest'+node['@id'],
+            url : node['@id'],
             fileSize : node.fileSize
           }];
         } else {
@@ -293,7 +293,7 @@ class ClientMedia {
 
     if( !node.clientMedia.download ) {
       node.clientMedia.download = [{
-        url : '/fcrepo/rest'+node['@id'],
+        url : node['@id'],
         label : 'pdf',
         fileSize : node.fileSize
       }];
@@ -320,7 +320,7 @@ class ClientMedia {
 
     if( !node.clientMedia.images.original ) {
       node.clientMedia.images.original = {
-        url : '/fcrepo/rest'+node['@id'],
+        url : node['@id'],
       }
     }
 

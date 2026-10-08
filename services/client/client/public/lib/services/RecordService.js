@@ -29,7 +29,7 @@ class RecordService extends BaseService {
 
   getGitInfo(id) {
     return this.request({
-      url : `/fcrepo/rest${id}`,
+      url : id,
       fetchOptions : {
         method : 'HEAD',
       },

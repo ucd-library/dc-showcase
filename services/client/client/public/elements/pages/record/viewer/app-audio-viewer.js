@@ -119,7 +119,8 @@ export default class AppAudioViewer extends Mixin(LitElement)
 
   _loadAudio() {
     let sourceEle = this.shadowRoot.querySelector('#audio_player source');
-    sourceEle.src = config.fcrepoBasePath+this.media['@id'];
+    // argonath-indexed items carry a playable url (a /cask/file/ silver path)
+    sourceEle.src = this.media.clientMedia?.audio?.url || this.media['@id'];
     sourceEle.type = this.media.fileFormat || this.media.hasMimeType || this.media.encodingFormat || '';
     
     // FF Hack.  Range slider not going back to 0 on stop

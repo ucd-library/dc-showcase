@@ -79,7 +79,7 @@ export default class DamsHighlightedCollection extends Mixin(LitElement).with(
     let clientEditsId = res.vcData.clientEdits?.['@id'];
     let overriddenFeatureImage =  res.vcData.clientEdits?.thumbnailUrl?.['@id'];
     if( clientEditsId && overriddenFeatureImage ) {
-      this.imgSrc = '/fcrepo/rest' + clientEditsId + '/featuredImage.jpg';
+      this.imgSrc = clientEditsId + '/featuredImage.jpg';
     } else if( res.vcData.images ) {
       let images = res.vcData.images;
       this.imgSrc = images.medium ? images.medium.url : images.original.url;

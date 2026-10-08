@@ -202,8 +202,8 @@ export default class AppMediaDownload extends Mixin(LitElement).with(
       let startIndex = pageNumber % 2 !== 0 ? pageNumber - 2 : pageNumber - 1;
 
       // set download href to 2 pages for archive download option
-      let image1 = pages[startIndex]?.download?.url?.replace('/fcrepo/rest', '');
-      let image2 = pages[startIndex + 1]?.download?.url?.replace('/fcrepo/rest', '');
+      let image1 = pages[startIndex]?.download?.url;
+      let image2 = pages[startIndex + 1]?.download?.url;
       let urls = [];
       if( image1 ) urls.push(image1);
       if( image2 ) urls.push(image2);
@@ -218,7 +218,7 @@ export default class AppMediaDownload extends Mixin(LitElement).with(
     this.zipName = this.rootRecord.name
       .replace(/[^a-zA-Z0-9]/g, "-")
       .toLowerCase();
-    this.archiveHref = '/fin/archive?paths=' + this.sources.map(s => s.url.replace('/fcrepo/rest', '')).join(',') + (this.zipName ? '&name='+this.zipName : '');
+    this.archiveHref = '/fin/archive?paths=' + this.sources.map(s => s.url).join(',') + (this.zipName ? '&name='+this.zipName : '');
 
     this.downloadAllMedia = true;
     let formats = [];
@@ -271,7 +271,7 @@ export default class AppMediaDownload extends Mixin(LitElement).with(
       this.zipName = this.rootRecord.name
         .replace(/[^a-zA-Z0-9]/g, "-")
         .toLowerCase();
-      this.archiveHref = '/fin/archive?paths=' + sources.map(s => s.url.replace('/fcrepo/rest', '')).join(',') + (this.zipName ? '&name='+this.zipName : '');
+      this.archiveHref = '/fin/archive?paths=' + sources.map(s => s.url).join(',') + (this.zipName ? '&name='+this.zipName : '');
     } else if( this.AppStateModel.location.fullpath === this.rootRecord['@id'] ) {
       // first image from imageList if exists, or mediaObject first download
       this.href = imageList?.clientMedia?.download?.[0]?.url || firstMediaDownload;
@@ -315,7 +315,7 @@ export default class AppMediaDownload extends Mixin(LitElement).with(
         singlePdf = true;
       }
       if( multipage ) {
-        if( this.archiveHref.indexOf(source.url?.split('/fcrepo/rest')?.[1]) > -1 ) multiImageSize += source.fileSize;
+        if( this.archiveHref.indexOf(source.url) > -1 ) multiImageSize += source.fileSize;
       }
     });
   
@@ -404,7 +404,7 @@ export default class AppMediaDownload extends Mixin(LitElement).with(
     if (!imageRecord || !imageRecord.url) return;
 
     // get the graph record for the image
-    imageRecord = this.graphIndex[imageRecord.url.split('/fcrepo/rest')[1]]; 
+    imageRecord = this.graphIndex[imageRecord.url]; 
 
     if( !imageRecord ) return;
     
@@ -429,7 +429,7 @@ export default class AppMediaDownload extends Mixin(LitElement).with(
   _onFormatSelected() {
     let selectedFormat = this.shadowRoot.querySelector("#format").value;
     let sources = this.sources.filter(s => s.label === selectedFormat || s.url?.split('.').pop() === selectedFormat);
-    this._setZipPaths(sources.map(s => s.url.replace('/fcrepo/rest', '')));
+    this._setZipPaths(sources.map(s => s.url));
   }
 
   /**
@@ -468,7 +468,7 @@ export default class AppMediaDownload extends Mixin(LitElement).with(
     if( this.isBookreader && !this.fullSetSelected ) {
       this._onBookreaderStateUpdate(this.BookReaderModel.getState());
     } else {
-      urls = sources.map(s => s.url.replace('/fcrepo/rest', ''));
+      urls = sources.map(s => s.url);
     }
     
     this._setZipPaths(urls);
@@ -486,7 +486,7 @@ export default class AppMediaDownload extends Mixin(LitElement).with(
     if( !urls.length ) return;
 
     if( urls.length === 1 ) {
-      this.archiveHref = '/fcrepo/rest'+urls[0];
+      this.archiveHref = urls[0];
       return;
     }
 
@@ -507,7 +507,7 @@ export default class AppMediaDownload extends Mixin(LitElement).with(
       return;
     }
 
-    let path = this.rootRecord["@id"].replace(config.fcrepoBasePath, "");
+    let path = this.rootRecord["@id"];
     gtag("event", "download", {
       event_category: "fullset",
       event_label: path,
@@ -524,7 +524,7 @@ export default class AppMediaDownload extends Mixin(LitElement).with(
       e.preventDefault();
       return;
     }
-    let path = this.href.replace(config.fcrepoBasePath, "");
+    let path = this.href;
 
     gtag("event", "download", {
       event_category: this.sourceType,

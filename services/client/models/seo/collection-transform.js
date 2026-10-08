@@ -43,7 +43,7 @@ module.exports = (jsonld, host='https://digital.ucdavis.edu') => {
   jsonld.distribution =  {
     '@type': 'DataDownload',
     'name': jsonld['@id'].replace(/\/collection\//, ''),
-    'contentUrl': host+'/fcrepo/rest'+jsonld['@id'],
+    'contentUrl': host+jsonld['@id'],
     'encodingFormat': 'text/html'
   }
 

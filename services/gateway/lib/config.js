@@ -16,12 +16,43 @@ if( fs.existsSync(envPath) && fs.lstatSync(envPath).isFile() ) {
   dotenv.config({ path: envPath });
 }
 
+function envToArray(value) {
+  if( !value ) {
+    return null;
+  }
+  return value.split(',').map(v => v.trim()).filter(v => v.length > 0);
+}
+const roleIgnoreList = envToArray(env.OIDC_ROLE_IGNORE_LIST);
+
 const config = {
 
   port : env.PORT || 3000,
 
+  publicUrl : env.PUBLIC_URL || 'http://localhost:3000',
+
   client : {
     url : env.CLIENT_URL || 'http://client:8000',
+  },
+
+  auth : {
+    oidc : {
+      clientId : env.OIDC_CLIENT_ID,
+      baseUrl : env.OIDC_BASE_URL,
+      secret : env.OIDC_CLIENT_SECRET,
+      scopes : env.OIDC_SCOPES || 'roles openid profile email',
+      roleIgnoreList : roleIgnoreList || [
+        "default-roles-argonath",
+        "uma_authorization",
+        "manage-account",
+        "manage-account-links",
+        "view-profile",
+        "offline_access"
+      ]
+    },
+    secret : env.AUTH_SECRET,
+    xUserHeader : env.X_USER_HEADER || 'x-argonath-user',
+    cookieName : process.env.JWT_COOKIE_NAME || 'argonath-jwt',
+    tokenCacheTTL : env.OIDC_TOKEN_CACHE_TTL ? parseInt(env.OIDC_TOKEN_CACHE_TTL) : (1000*60*5)
   },
 
   iiif : {

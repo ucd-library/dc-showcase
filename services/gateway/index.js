@@ -3,6 +3,7 @@ import httpProxy from 'http-proxy';
 import config from './lib/config.js';
 import caskClient from './lib/cask-client.js';
 import { logger, logReqMiddleware } from './lib/logger.js';
+import { init as initAuthMiddleware } from './controllers/auth.js';
 
 // matches the ark segment (and optional sub-path) of a fin container path, e.g.
 // /fcrepo/rest/item/ark:/87293/d38j6q/original.jpg -> ark:/87293/d38j6q, /original.jpg
@@ -24,7 +25,17 @@ proxy.on('error', (err, req, res) => {
 
 app.use(logReqMiddleware(logger));
 
-// TODO: any fcrepo/rest path should check access first.
+// strip all x-* headers from requests
+app.use((req, res, next) => {
+  for (const header in req.headers) {
+    if (header.startsWith('x-')) {
+      delete req.headers[header];
+    }
+  }
+  next();
+});
+
+initAuthMiddleware(app);
 
 app.use(async (req, res, next) => {
   if( !req.path.startsWith('/cask/') ) {
