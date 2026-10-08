@@ -123,12 +123,17 @@ export default function render() {
         border: none;
       }
 
+      .transcript-download {
+        margin-left: 10px;
+      }
+
       .downloadBtn:hover {
         background-color: var(--color-aggie-blue);
         color: var(--color-aggie-gold);
       }
 
-      #format {
+      #format,
+      #transcriptFormat {
         height: 2.65rem;
         background-color: var(--color-aggie-blue-50);
         font-size: 1rem;
@@ -136,6 +141,11 @@ export default function render() {
         padding: 0 1.5rem 0 1rem;
         min-width: 35%;
         max-width: 6rem;
+      }
+
+      #transcriptFormat {
+        max-width: 15rem;
+        flex: 1;
       }
 
       #media-format-label,
@@ -163,7 +173,7 @@ export default function render() {
     </style>
 
     <div id="wrapper">
-      <div class="layout" ?hidden="${!this.hasMultipleDownloadMedia || this.downloadAllMedia}">
+      <div class="layout" ?hidden="${!!this.transcriptOptions?.length || !this.hasMultipleDownloadMedia || this.downloadAllMedia}">
         <div class="radio" style="margin-right: 1rem">
           <input
             id="single"
@@ -187,7 +197,7 @@ export default function render() {
       </div>
     </div>
 
-    <div ?hidden="${this.fullSetSelected}">
+    <div ?hidden="${!!this.transcriptOptions?.length || this.fullSetSelected}">
       <div class="layout btns"
         ?hidden="${!this.selectedMediaHasSources}">
         <span id="multimedia-format-label"
@@ -218,22 +228,23 @@ export default function render() {
       </div>
     </div>
 
-    <div ?hidden="${(this.fullSetSelected || this.isTwoPageView) && this.selectedMediaHasSources}">
+    <div ?hidden="${!!this.transcriptOptions?.length || ((this.fullSetSelected || this.isTwoPageView) && this.selectedMediaHasSources)}">
       <div ?hidden="${this.selectedMediaHasSources}">
         <em>No downloadable items available</em>
       </div>
     </div>
 
-    <div style="display: flex;">
+    <div style="display: flex;" ?hidden="${!!this.transcriptOptions?.length}">
       <span id="multimedia-all-format-label"
         ?hidden="${!this.fullSetSelected || !this.isMultimedia}">
       </span>
       <span id="media-all-format-label"
-        style="display: inline-block;"  
+        style="display: inline-block;"
         ?hidden="${!this.fullSetSelected || !this.showDownloadLabel}">
         </span>
       <select id="format"
         style="display: inline-block"
+        aria-label="Download format"
         @change="${this._onFormatSelected}"
         ?hidden="${!this.fullSetSelected || !this.showImageFormats || this.sources.length < 2}">
       </select>
@@ -248,7 +259,25 @@ export default function render() {
       </a>
     </div>
 
-    <!-- <form id="downloadZip" 
+    <div class="layout" ?hidden="${!this.transcriptOptions?.length || this.disableDownload}">
+      <select id="transcriptFormat"
+        aria-label="Download format"
+        @change="${this._onTranscriptFormatSelected}">
+        ${(this.transcriptOptions || []).map(o => html`
+          <option value="${o.url}" ?selected="${o === this.selectedTranscriptDownload}">${o.label}</option>
+        `)}
+      </select>
+      <a class="downloadBtn archive btn"
+        href="${this.selectedTranscriptDownload?.url}"
+        aria-label="Download ${this.selectedTranscriptDownload?.label}"
+        target="_blank"
+        rel="noopener"
+        download>
+        <span> Download </span>
+      </a>
+    </div>
+
+    <!-- <form id="downloadZip"
       action="/fin/archive" 
       method="get" 
       ?hidden="${!this.fullSetSelected}">    

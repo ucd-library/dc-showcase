@@ -180,7 +180,7 @@ return html`
   <div>Render ratio dimension: ${this.pageData.renderRatioDimension}</div>
 </div> 
 
-<img ?hidden="${this.debug || this.loading}" draggable="false" src="${this.pageData?.imageUrl}" alt="">
+<img ?hidden="${this.debug || this.loading}" draggable="false" src="${this.pageData?.imageUrl}" alt="${this.pageData?.altText || `Page ${this.pageData?.page ?? ''}`}">
 <div ?hidden="${!this.loading}" class="loading">
   <div></div>
 </div>

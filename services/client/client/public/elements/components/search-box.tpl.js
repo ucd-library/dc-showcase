@@ -57,6 +57,11 @@ export default function render() {
       #input {
         border-radius: unset;
       }
+
+      #input:focus-visible {
+        outline: 2px solid var(--color-dams-secondary, #FFBF00);
+        outline-offset: -2px;
+      }
     </style>
     <div class="root search-bar">
       <div class="search-container" style="flex:1">

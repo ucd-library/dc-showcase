@@ -5,7 +5,6 @@ import render from "./app-media-download.tpl.js";
 import { Mixin, LitCorkUtils } from '@ucd-lib/cork-app-utils';
 
 import config from "../../../lib/config";
-import utils from "../../../lib/utils";
 import bytes from "bytes";
 
 export default class AppMediaDownload extends Mixin(LitElement).with(
@@ -32,7 +31,10 @@ export default class AppMediaDownload extends Mixin(LitElement).with(
       isTwoPageView : { type: Boolean },
       downloadAllMedia : { type: Boolean },
       isBookreader : { type: Boolean },
-      disableDownload : { type: Boolean }
+      disableDownload : { type: Boolean },
+      transcript : { type: Object },
+      transcriptOptions : { type: Array },
+      selectedTranscriptDownload : { type: Object }
     };
   }
 
@@ -78,6 +80,9 @@ export default class AppMediaDownload extends Mixin(LitElement).with(
     this.downloadAllMedia = false;
     this.isBookreader = false;
     this.disableDownload = APP_CONFIG.disableFileDownloads;
+    this.transcript = null;
+    this.transcriptOptions = [];
+    this.selectedTranscriptDownload = null;
   }
 
   _onAppStateUpdate(e) {
@@ -96,6 +101,7 @@ export default class AppMediaDownload extends Mixin(LitElement).with(
     this.clientMedia = clientMedia;
     this.graphIndex = graph.index;
     this.selectedMediaPage = selectedMediaPage;
+    this.transcript = clientMedia.transcript || null;
 
     this.sources = this._getDownloadSources();
 
@@ -129,7 +135,7 @@ export default class AppMediaDownload extends Mixin(LitElement).with(
     if( this.isMultimedia ) {
       this.fullSetSelected = false;
       let download = this.downloadOptions[0];
-      this.shadowRoot.querySelector("#multimedia-format-label").innerHTML = download.fileFormatSimple + ' (' + bytes(download.fileSize).toLowerCase() + ')';
+      this.shadowRoot.querySelector("#multimedia-format-label").innerHTML = (download.fileFormatSimple || '') + ' (' + bytes(download.fileSize).toLowerCase() + ')';
       this.showImageFormats = false;
 
       // update all label to include video + other media (prob just thumbnail)
@@ -162,6 +168,71 @@ export default class AppMediaDownload extends Mixin(LitElement).with(
     if( pdf && !this.isMultimedia && this.firstLoad ) {
       this._toggleMultipleDownload(null, true);
     }
+
+    this._buildTranscriptOptions();
+  }
+
+  /**
+   * @method _buildTranscriptOptions
+   * @description build the primary-media + extras dropdown options shown when a
+   * schema:transcript link and/or ucdlib:SupplementaryDocument-marked associatedMedia
+   * (see ClientMedia.resolveTranscript()/resolveSupplementaryDocuments()) are present.
+   * Kept independent of the imagelist/pdf archive download flow (sources/archiveHref/
+   * #format) - this is just a simple choice between the selected media and its extras,
+   * not a paged document.
+   */
+  _buildTranscriptOptions() {
+    let extraOptions = [];
+
+    // a real transcript keeps its "Transcript: FORMAT (size)" label; a supplementary
+    // document (e.g. a biography) just shows "FORMAT (size)" - see last discussion,
+    // no need to spell out what kind of supplementary doc it is in the dropdown.
+    if( this.transcript ) {
+      let format = (this.transcript.format || '').toUpperCase();
+      extraOptions.push({
+        label : this.transcript.label + ': ' + format + (this.transcript.fileSize ? ' (' + bytes(this.transcript.fileSize).toLowerCase() + ')' : ''),
+        url : this.transcript.url
+      });
+    }
+
+    (this.clientMedia?.supplementaryDownloads || []).forEach(doc => {
+      let format = (doc.format || '').toUpperCase();
+      extraOptions.push({
+        label : format + (doc.fileSize ? ' (' + bytes(doc.fileSize).toLowerCase() + ')' : ''),
+        url : doc.url
+      });
+    });
+
+    if( !extraOptions.length ) {
+      this.transcriptOptions = [];
+      this.selectedTranscriptDownload = null;
+      return;
+    }
+
+    let mediaFormat = (this.href.split('.').pop() || '').toUpperCase();
+    let mediaFileSize = this.sources.find(s => s.url === this.href)?.fileSize;
+
+    this.transcriptOptions = [
+      {
+        label : mediaFormat + (mediaFileSize ? ' (' + bytes(mediaFileSize).toLowerCase() + ')' : ''),
+        url : this.href
+      },
+      ...extraOptions
+    ];
+
+    // default to the first extra (a real transcript if present, else the first
+    // supplementary doc) being selected/shown
+    this.selectedTranscriptDownload = this.transcriptOptions[1];
+  }
+
+  /**
+   * @method _onTranscriptFormatSelected
+   * @private
+   * @description bound to the transcript/media format dropdown change event
+   */
+  _onTranscriptFormatSelected() {
+    let value = this.shadowRoot.querySelector('#transcriptFormat').value;
+    this.selectedTranscriptDownload = this.transcriptOptions.find(o => o.url === value) || this.transcriptOptions[0];
   }
 
   /**
@@ -319,18 +390,18 @@ export default class AppMediaDownload extends Mixin(LitElement).with(
       }
     });
   
-    if( singlePdf && formats.length > 0 ) singlePdf = false; 
+    if( singlePdf && formats.length > 0 ) singlePdf = false;
 
-    let imageLabel = singlePdf ? 'pdf ' : '';
+    let imageLabel = singlePdf ? 'PDF ' : '';
 
     let viewingPdf = this.AppStateModel.location.fullpath.replace(/:\d+$/, '')?.split('.')?.pop() === 'pdf';
     if( viewingPdf ) {
       singlePdf = true;
-      imageLabel = this.href.split('.').pop(); // get format from url, could be workflow image or pdf
+      imageLabel = (this.href.split('.').pop() || '').toUpperCase(); // get format from url, could be workflow image or pdf
     }
 
     let fileSize = this.sources.find(s => s.url === this.href)?.fileSize;
-    if( formats.length && !viewingPdf ) imageLabel += formats.join(', ') + ' ';
+    if( formats.length && !viewingPdf ) imageLabel += formats.map(f => (f || '').toUpperCase()).join(', ') + ' ';
 
     // if multipage, combine file sizes
     if( multipage && multiImageSize ) {
@@ -375,7 +446,7 @@ export default class AppMediaDownload extends Mixin(LitElement).with(
       
       formats.forEach((format) => {
         let option = document.createElement("option");
-        let imageLabel = format.format;
+        let imageLabel = (format.format || '').toUpperCase();
         if( format.fileSize && !isNaN(format.fileSize) ) imageLabel += ' (' + bytes(format.fileSize).toLowerCase() + ')';
         option.value = format.format;
         option.innerHTML = imageLabel
@@ -384,9 +455,9 @@ export default class AppMediaDownload extends Mixin(LitElement).with(
       this.showDownloadLabel = false;
     } else {
       this.showDownloadLabel = true;
-    
+
       let imageLabel = '';
-      if( formats.length ) imageLabel += formats.map(f => f.format).join(', ') + ' ';
+      if( formats.length ) imageLabel += formats.map(f => (f.format || '').toUpperCase()).join(', ') + ' ';
       imageLabel += '(' + (bytes(formats.reduce(((a, r) => a + r.fileSize), 0))||'').toLowerCase() + ')';
       
       this.shadowRoot.querySelector("#media-format-label").innerHTML = imageLabel;
