@@ -53,7 +53,7 @@ app.use(async (req, res, next) => {
     return next();
   }
 
-  let parts = req.path.split(/\/-\/.*$/);
+  let parts = req.path.split(/\/-\//);
   let caskPath = parts[0].replace('/iiif', '');
   let metadata;
   try {
@@ -62,13 +62,16 @@ app.use(async (req, res, next) => {
     logger.error(`Error fetching metadata for ${caskPath}: ${err.message}`);
     return res.status(500).send('Error finding cask file for IIIF request');
   }
-  console.log('metadata', metadata);
+
   let iiifQuery = parts[1];
   let casPath = caskClient.casRelativePath(metadata.hash_value);
-  console.log('casPath', casPath, 'iiifQuery', iiifQuery);
 
-  req.url = config.iiif.basePath + casPath + iiifQuery;
-  logger.info(`Rewriting ${req.path} -> ${req.url} to ${config.iiif.url} for IIIF request`);
+  req.url = '/'+[config.iiif.basePath, casPath, iiifQuery]
+    .map(p => p.replace(/\/+$/, '')) // remove trailing slashes
+    .map(p => p.replace(/^\/+/, '')) // remove leading slashes
+    .join('/');
+  logger.debug(`Rewriting ${req.path} -> ${req.url} to ${config.iiif.url} for IIIF request`);
+  
   proxy.web(req, res, { target: config.iiif.url });
 });
 
