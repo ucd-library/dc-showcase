@@ -11,7 +11,6 @@ import { Mixin, LitCorkUtils } from '@ucd-lib/cork-app-utils';
 import "../../../utils/app-share-btn";
 import "./app-transcript-panel";
 
-import config from "../../../../lib/config";
 import utils from "../../../../lib/utils";
 import videoLibs from "../../../../lib/utils/video-lib-loader";
 import bytes from "bytes";
@@ -169,7 +168,7 @@ export default class AppAudioViewer extends Mixin(LitElement)
           kind: 'captions',
           label: utils.getLanguage(lng),
           srclang: lng,
-          src: config.fcrepoBasePath+caption['@id'],
+          src: caption['@id'],
           default: setDefault
         };
       });
