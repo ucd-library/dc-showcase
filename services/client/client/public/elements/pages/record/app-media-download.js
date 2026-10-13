@@ -129,20 +129,23 @@ export default class AppMediaDownload extends Mixin(LitElement).with(
   _onSelectedRecordMediaUpdate(media) {
     this.selectedRecordMedia = media;
     this.downloadOptions = [this.selectedRecordMedia];
-    this.isMultimedia = this.downloadOptions[0]?.fileFormat?.includes('video');
+    let fileFormat = this.downloadOptions[0]?.fileFormat || '';
+    this.isMultimedia = fileFormat.includes('video') || fileFormat.includes('audio');
     let pdf;
 
     if( this.isMultimedia ) {
       this.fullSetSelected = false;
       let download = this.downloadOptions[0];
-      this.shadowRoot.querySelector("#multimedia-format-label").innerHTML = (download.fileFormatSimple || '') + ' (' + bytes(download.fileSize).toLowerCase() + ')';
+      let downloadUrl = download.clientMedia?.download?.[0]?.url || download['@id'] || '';
+      let formatLabel = (downloadUrl.split('.').pop() || formatLabel).toUpperCase();
+      this.shadowRoot.querySelector("#multimedia-format-label").innerHTML = formatLabel + ' (' + bytes(download.fileSize).toLowerCase() + ')';
       this.showImageFormats = false;
 
       // update all label to include video + other media (prob just thumbnail)
       // multimedia-all-format-label
       let filesize = this.sources.reduce((a, r) => a + r.fileSize, 0);
       // let fileTypes = this.sources.map(s => s.url?.split('.')?.pop()).join(', ');
-      let label = 'video (' + bytes(filesize).toLowerCase() + ')';
+      let label = formatLabel + ' (' + bytes(filesize).toLowerCase() + ')';
       this.shadowRoot.querySelector("#multimedia-all-format-label").innerHTML = label;
 
     } else {
@@ -335,7 +338,8 @@ export default class AppMediaDownload extends Mixin(LitElement).with(
     if( this.disableDownload ) return;
 
     let imageList = this.clientMedia.mediaGroups.filter(m => m['@shortType'].includes('ImageList'))[0];
-    let firstMediaDownload = this.clientMedia.mediaGroups[0]?.clientMedia?.download?.[0]?.url;
+    let firstMediaDownload = this.selectedMedia?.clientMedia?.download?.[0]?.url ||
+      this.clientMedia.mediaGroups[0]?.clientMedia?.download?.[0]?.url;
 
     if( this.fullSetSelected || this.isTwoPageView ) {
       // build zip download url

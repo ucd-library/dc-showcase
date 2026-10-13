@@ -236,7 +236,7 @@ export default function render() {
 
     <div style="display: flex;" ?hidden="${!!this.transcriptOptions?.length}">
       <span id="multimedia-all-format-label"
-        ?hidden="${!this.fullSetSelected || !this.isMultimedia}">
+        ?hidden="${!this.fullSetSelected || !this.isMultimedia || (this.showImageFormats && this.sources.length > 1)}">
       </span>
       <span id="media-all-format-label"
         style="display: inline-block;"
