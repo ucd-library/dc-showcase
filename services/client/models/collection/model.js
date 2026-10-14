@@ -65,7 +65,7 @@ class CollectionsModel extends EsDataModel {
     if( !collection ) return collection;
     let resp = await clientEditsModel.get(collection['@id']);
 
-    if( resp?.collection ) {
+    if( resp?.collection && Object.keys(resp.collection).length ) {
       collection['@graph'].push(resp.collection);
     }
   }
