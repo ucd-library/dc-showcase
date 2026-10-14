@@ -13,12 +13,20 @@ class RecordGraph {
     this.index = {};
     this.root = null;
     this._score = data._score;
+    this.displayImage = data.displayImage || null;
     this.init();
   }
 
   init() {
+    let clientMedia = this.data.clientMedia || {};
+
     for( let item of this.data['@graph'] ) {
       item.id = item['@id'];
+
+      // root clientMedia is keyed by sameAs
+      if( item.sameAs && clientMedia[item.sameAs] ) {
+        item.clientMedia = clientMedia[item.sameAs];
+      }
 
       // if the node id is the main data id, this is the root
       if( item['@id'] === this.data['@id'] ) {

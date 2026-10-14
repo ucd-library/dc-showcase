@@ -53,6 +53,12 @@ let config = {
         'roles', '@graph.indexableContent',
         '@graph.createdBy', '@graph.lastModifiedBy', '@graph._',
         '@graph.image', '@graph.textIndexable', '@graph.lastModified'
+      ],
+      // search results skip per-file media
+      excludeSearch: [
+        'roles', '@graph.indexableContent',
+        '@graph.createdBy', '@graph.lastModifiedBy', '@graph._', '@graph.textIndexable',
+        'clientMedia'
       ]
     }
   },

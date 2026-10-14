@@ -45,6 +45,7 @@ function createDefaultApi(model, opts={}) {
         debug: req.query.debug,
         compact: req.query.compact ? true : false,
         singleNode: req.query['single-node'] ? true : false,
+        clientMedia: req.query['client-media'] ? true : false,
         roles: req.esRoles
       }));
     } catch(e) {

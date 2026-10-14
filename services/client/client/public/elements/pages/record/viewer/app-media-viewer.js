@@ -109,7 +109,10 @@ export default class AppMediaViewer extends Mixin(LitElement)
 
     if (!mediaGroups || !mediaGroups.length || !mediaGroups.filter(m => m['@type'].length > 0).length ) {
       // try to at least load a single image as fallback
-      let thumbnailUrl = utils.getThumbnailFromClientMedia(e?.selectedRecord?.clientMedia);
+      let thumbnailUrl = utils.getThumbnailFromClientMedia(
+        e?.selectedRecord?.clientMedia,
+        { displayImage: e?.selectedRecord?.graph?.displayImage }
+      );
       if( thumbnailUrl ) {
         this.mediaType = 'image';
       } else {

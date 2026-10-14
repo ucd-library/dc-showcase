@@ -32,6 +32,7 @@ class EsDataModel {
    *
    * @param {Object} searchDocument
    * @param {Boolean} options.debug will return searchDocument and esBody in result
+   * @param {Boolean} options.clientMedia include root clientMedia (excluded by default)
    *
    * @returns {Promise} resolves to search result
    */
@@ -46,13 +47,20 @@ class EsDataModel {
     }
 
     let esBody = finSearch.searchDocumentToEsBody(searchDocument);
-    let esResult = await this.esSearch(esBody, {admin: options.admin, roles: options.roles}, index);
+    let esResult = await this.esSearch(esBody, {
+      admin: options.admin,
+      roles: options.roles,
+      _source_excludes: options.clientMedia ? undefined : 'search'
+    }, index);
     let result = finSearch.esResultToDamsResult(esResult, searchDocument);
 
     result.results.forEach(item => {
       if( item._source ) item = item._source;
       if( options.compact ) this.utils.compactAllTypes(item);
-      if( options.singleNode ) item['@graph'] = this.utils.singleNode(item['@id'], item['@graph']);
+      if( options.singleNode ) {
+        this.utils.hydrateClientMedia(item);
+        item['@graph'] = this.utils.singleNode(item['@id'], item['@graph']);
+      }
     });
 
     if( options.debug ) {
@@ -102,7 +110,10 @@ class EsDataModel {
 
     result = result.hits.hits[0]._source;
     if( opts.compact ) this.utils.compactAllTypes(result);
-    if( opts.singleNode ) result['@graph'] = this.utils.singleNode(id, result['@graph']);
+    if( opts.singleNode ) {
+      this.utils.hydrateClientMedia(result);
+      result['@graph'] = this.utils.singleNode(id, result['@graph']);
+    }
 
     return result;
   }
@@ -140,6 +151,8 @@ class EsDataModel {
       delete options._source_excludes;
     } else if( options._source_excludes === 'compact' ) {
       options._source_excludes = config.elasticsearch.fields.excludeCompact.join(',');
+    } else if( options._source_excludes === 'search' ) {
+      options._source_excludes = config.elasticsearch.fields.excludeSearch.join(',');
     } else if( Array.isArray(options._source_excludes) ) {
       options._source_excludes = options._source_excludes.join(',');
     } else {
