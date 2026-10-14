@@ -63,6 +63,12 @@ let config = {
     }
   },
 
+  // collection itemCount sync - see lib/item-count-cron.js
+  itemCountCron: {
+    enabled: process.env.ITEM_COUNT_CRON_ENABLED !== 'false',
+    interval: parseInt(process.env.ITEM_COUNT_CRON_INTERVAL || String(1000 * 60 * 5))
+  },
+
   // simplified stand-in for fin's FinAC role names - see lib/es-model.js
   finac: {
     agents: {
