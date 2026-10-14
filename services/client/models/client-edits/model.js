@@ -24,9 +24,17 @@ class ClientEditsModel {
     return null;
   }
 
+  /**
+   * @method getItemEdits
+   * @description Get the display-config edits for a single item
+   *
+   * @param {String} id item id, e.g. /item/ark:/...
+   *
+   * @returns {Promise<Object>} cleaned edit object for the item
+   */
   async getItemEdits(id) {
     let resp = await pg.query(
-      `SELECT * FROM dams_edits.edit WHERE item_id = $1;`,
+      `SELECT * FROM dcf_edits.edit WHERE item_id = $1;`,
       [id]
     );
 
@@ -38,9 +46,19 @@ class ClientEditsModel {
     return this.cleanEditForApi(id, edits);
   }
 
+  /**
+   * @method getCollectionEdits
+   * @description Get the display-config edits for a collection, plus any
+   * item-level edits stored under that collection
+   *
+   * @param {String} id collection id, e.g. /collection/foo
+   *
+   * @returns {Promise<Object>} object with `collection` (cleaned collection edit)
+   * and `items` (map of item id to cleaned item edit)
+   */
   async getCollectionEdits(id) {
     let resp = await pg.query(
-      `SELECT * FROM dams_edits.edit WHERE collection_id = $1;`,
+      `SELECT * FROM dcf_edits.edit WHERE collection_id = $1;`,
       [id]
     );
 
