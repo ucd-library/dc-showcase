@@ -53,6 +53,7 @@ module.exports = async (app) => {
         featuredImages : config.client.featuredImages,
         itemTextFields : config.client.itemTextFields,
         collectionTextFields : config.client.collectionTextFields,
+        useDateRangeFields : config.client.useDateRangeFields,
         env : config.client.env,
         disableFileDownloads : config.gateway.proxy.disableFileDownloads,
         downloadMirrorUrl : config.fcrepo.dataMirror.url,

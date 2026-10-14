@@ -85,6 +85,7 @@ export default class AppMediaViewerNav extends Mixin(LitElement).with(
 
   _onAppStateUpdate(e) {
     if( this.AppStateModel.location.page !== 'item' ) this._reset();
+
     if (e.mediaViewerNavLeftMostThumbnail === undefined) return;
     if (e.mediaViewerNavLeftMostThumbnail === this.leftMostThumbnail) return;
 

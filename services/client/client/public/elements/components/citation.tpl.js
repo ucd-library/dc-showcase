@@ -130,7 +130,7 @@ return html`
 
       .cite-collection {
         /* padding-top: 0; */
-        width: 95%;
+        width: 90%;
         padding: 1rem;
       }
 
@@ -146,7 +146,7 @@ return html`
     }
 
 </style>
-<div class="citation">
+<div class="citation" role="region" aria-label="Citation information">
   <div class="cite-graphic">
     <img src="/images/watercolors/citation-watercolor-800px-landscape.png" width="100%" alt="cite this collection image" />
   </div>
@@ -165,7 +165,12 @@ return html`
         <option value="mla">MLA</option>
         <option value="chicago">Chicago</option>
       </select>
-      <div class="btn btn-copy" @click="${this._copyCiteText}">Copy Text</div>
+      <div class="btn btn-copy" 
+        role="button"
+        tabindex="0"
+        aria-label="Copy citation text"
+        @click="${this._copyCiteText}"
+        @keydown="${this._onCopyKeyDown}">Copy Text</div>
     </div>
   </div>
   <app-toast-popup></app-toast-popup>

@@ -41,6 +41,8 @@ export default class UcdlibBookreaderPage extends Mixin(LitElement)
   }
 
   firstUpdated() {
+    this.setAttribute('role', 'group');
+    this.setAttribute('aria-roledescription', 'page');
     this.imgEle = this.shadowRoot.querySelector('img');
     this._updatePageData();
     this._onBookreaderStateUpdate(this.BookReaderModel.getState());
@@ -135,6 +137,7 @@ export default class UcdlibBookreaderPage extends Mixin(LitElement)
     }
 
     this.pageData = this.bookData.pages[this.page];
+    this.setAttribute('aria-label', `Page ${this.pageData.page} of ${this.bookData.pages.length}`);
 
     this.style.top = this.pageData.renderOffsetTop+'px';
     this.style.left = this.pageData.renderOffsetLeft+'px';

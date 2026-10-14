@@ -1,6 +1,7 @@
 import {BaseModel} from '@ucd-lib/cork-app-utils';
 import BookReaderService from '../services/BookReaderService.js';
 import BookReaderStore from '../stores/BookReaderStore.js';
+import utils from '../utils';
 
 class BookReaderModel extends BaseModel {
 
@@ -203,7 +204,7 @@ class BookReaderModel extends BaseModel {
     }
 
     let manifest = this.store.data.bookManifest.get(id);
-    let index, image, ocrUrl, imageUrl, height, width, originalHeight, originalWidth, scale, filename;
+    let index, image, ocrUrl, imageUrl, height, width, originalHeight, originalWidth, scale, filename, altText;
     let bookViewData = {
       id,
       totalHeight : 0,
@@ -214,6 +215,8 @@ class BookReaderModel extends BaseModel {
     if( manifest.payload.length ) {
       isIndex0 = manifest.payload[0].page === 0;
     }
+
+    let rootNode = record.graph?.root || {};
 
     bookViewData.pages = manifest.payload
       .filter(page => this._isValidPage(page))
@@ -228,8 +231,9 @@ class BookReaderModel extends BaseModel {
         originalHeight = parseInt(page?.original?.size?.height || page?.large?.size?.height);
         originalWidth = parseInt(page?.original?.size?.width || page?.large?.size?.width);
         scale = width / originalWidth;
-        filename = page['@id']?.split('/').pop()
-        return {height, width, imageUrl, scale, ocrUrl, index, originalHeight, originalWidth, page: page.page, filename};
+        filename = page['@id']?.split('/').pop();
+        altText = utils.getAltText(page['@id'] ? (record.clientMedia.getNode(page['@id']) || {}) : {}, rootNode);
+        return {height, width, imageUrl, scale, ocrUrl, index, originalHeight, originalWidth, page: page.page, filename, altText};
     });
 
     bookViewData.pages.sort((a, b) => {

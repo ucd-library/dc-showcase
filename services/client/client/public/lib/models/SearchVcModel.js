@@ -102,7 +102,7 @@ class SearchVcModel extends BaseModel {
         multiImage,
         collection: result.root.publisher ? result.root.publisher.name : "", // for detail display
         creator: result.root.creator ? result.root.creator.name : "", // for detail display
-        date: result.root.yearPublished || 'Undated', // for detail display
+        date: result.root.dateDisplay || result.root.yearPublished || 'Undated', // for detail display
         format: mediaTypes.length ? mediaTypes.join(', ') : null, // for detail display,
         size
       });

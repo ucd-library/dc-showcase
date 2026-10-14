@@ -176,7 +176,9 @@ class AppRecord extends Mixin(LitElement)
     this.name = this.record.name;
     this.collectionName = this.record.collectionName;
     this.description = this.record.description;
-    this.date = utils.formatDateString(this.record.date);
+    // already fully formatted by RecordVcModel (dateDisplay, or formatDateString as a fallback
+    // for records indexed before dateDisplay existed) - don't reformat it again here
+    this.date = this.record.date;
     this.publisher = this.record.publisher;
     this.subjects = this.record.subjects || [];
     this.callNumber = this.record.callNumber;
@@ -521,7 +523,11 @@ class AppRecord extends Mixin(LitElement)
     } 
 
     if (!imagePath && mediaGroup?.['@shortType']?.includes('ImageList')) {
-      imagePath = mediaGroup.encodesCreativeWork?.['@id'] || mediaGroup.clientMedia?.images?.original?.url || path;
+      if( mediaGroup.encodesCreativeWork?.['@id'] && path !== mediaGroup.encodesCreativeWork?.['@id'] ) {
+        imagePath = mediaGroup.encodesCreativeWork?.['@id'];
+      } else {
+        imagePath = mediaGroup.clientMedia?.images?.original?.url || path;
+      }
     } else {
       imagePath = selectedRecord.selectedMedia?.['@id'];
     }

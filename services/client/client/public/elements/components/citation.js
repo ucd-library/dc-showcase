@@ -72,6 +72,13 @@ export class Citation extends LitElement {
     }
   }
 
+  _onCopyKeyDown(e) {
+    if (e.key === 'Enter' || e.key === ' ') {
+      e.preventDefault();
+      this._copyCiteText();
+    }
+  }
+
 }
 
 customElements.define('app-citation', Citation);

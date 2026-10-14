@@ -152,6 +152,12 @@ config.client = {
   itemTextFields : process.env.ITEM_TEXT_FIELDS || '@graph.text_search_description, name.punctuation_insensitive, name.stem, @graph.identifier, @graph.about, @graph.keywords, @graph.indexableContent',
   collectionTextFields : process.env.COLLECTION_TEXT_FIELDS || '@graph.name.stem, @graph.description.stem, @graph.about.stem, @graph.keywords.stem',
 
+  // when false (default), the date facet queries the legacy scalar yearPublished field.
+  // once yearPublishedStart/yearPublishedEnd have been backfilled by reindexing, flip this
+  // to true so the date facet/filter switches over to them (needed for circa/range/uncertain
+  // dates, which leave yearPublished null). Same env var name used by the models service.
+  useDateRangeFields : process.env.USE_DATE_RANGE_FIELDS === 'true',
+
   env : {
     CLIENT_ENV : env,
     FIN_APP_VERSION : process.env.FIN_APP_VERSION || '',

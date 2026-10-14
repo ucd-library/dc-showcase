@@ -322,6 +322,7 @@ export default function render() {
         border-radius: 5px;
         background: var(--color-aggie-blue);
         color: #fff;
+        font-family: inherit;
         font-size: 1rem;
         font-weight: bold;
         white-space: nowrap;

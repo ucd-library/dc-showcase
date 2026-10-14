@@ -172,8 +172,9 @@ export function styles() {
 
 export function render() {
   return html`
-    <div class="container container-footer">
-
+    <div class="container container-footer" 
+      role="contentinfo"
+      aria-label="Site footer">
       <div id="section-columns" shadow-anchor="section-columns">
         <div id="address-column">
           <div class="lib-logo-container">
@@ -191,7 +192,7 @@ export function render() {
 
       <div class="section-aggie-logo">
         <div class="container-aggie-logo">
-          <a href="https://www.ucdavis.edu">${this._renderAggieLogo()}</a>
+          <a href="https://www.ucdavis.edu" aria-label="UC Davis home page">${this._renderAggieLogo()}</a>
         </div>
       </div>
       <div class="section-campus-info">${this._renderCampusInfo()}</div>

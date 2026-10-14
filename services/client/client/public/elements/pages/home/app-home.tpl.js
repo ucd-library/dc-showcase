@@ -729,7 +729,7 @@ export default function render() {
     </ucd-theme-header>
 
     <div class="hero-top site-frame">
-      <div class="hero-top-left"><a href="https://ucdavis.edu"><img src="/images/logos/ucdavis_logo_gold.png"></a></div>
+      <div class="hero-top-left"><a href="https://ucdavis.edu"><img src="/images/logos/ucdavis_logo_gold.png" alt="UC Davis Logo"></a></div>
       <div class="hero-top-right">
         <a href="/browse">Browse</a>
         <span class="dot"></span>

@@ -11,6 +11,64 @@ class Utils {
     brTwoPage: "Book Reader - 2 Page",
   };
 
+  // keep in sync with the @media(max-width:768px) breakpoint used in these
+  // same components' CSS, so JS and CSS never disagree about "mobile"
+  mobileBreakpoint = 768;
+
+  /**
+   * @method watchMobileViewport
+   * @description watch for the viewport crossing the mobile breakpoint, invoking
+   * onChange immediately with the current state and again on every crossing
+   *
+   * @param {Function} onChange called with a Boolean (true if viewport is at or
+   * below the mobile breakpoint)
+   *
+   * @returns {Function} unsubscribe function - call to stop watching
+   */
+  watchMobileViewport(onChange) {
+    const mql = window.matchMedia(`(max-width: ${this.mobileBreakpoint}px)`);
+    const listener = () => onChange(mql.matches);
+    mql.addEventListener('change', listener);
+    onChange(mql.matches);
+    return () => mql.removeEventListener('change', listener);
+  }
+
+  // scroll position recorded at lock time, restored on unlock
+  _lockedScrollY = 0;
+
+  /**
+   * @method lockBodyScroll
+   * @description lock or unlock page scroll - used when a component enters a
+   * fixed-position fullscreen mode (eg the bookreader fullscreen view, or the
+   * mobile transcript sheet) so the page underneath can't scroll behind it.
+   * Pins <body> with position:fixed at the current scroll offset rather than
+   * just setting overflow:hidden - Safari on iOS doesn't reliably honor
+   * overflow:hidden on <body> to block touch-driven scrolling, so that alone
+   * still lets the page scroll behind a "locked" fullscreen view there.
+   *
+   * @param {Boolean} locked
+   */
+  lockBodyScroll(locked) {
+    if( locked ) {
+      this._lockedScrollY = window.scrollY;
+      document.documentElement.style.overflow = 'hidden';
+      document.body.style.position = 'fixed';
+      document.body.style.top = `-${this._lockedScrollY}px`;
+      document.body.style.left = '0';
+      document.body.style.right = '0';
+      document.body.style.width = '100%';
+    } else {
+      document.documentElement.style.overflow = '';
+      document.body.style.position = '';
+      document.body.style.top = '';
+      document.body.style.left = '';
+      document.body.style.right = '';
+      document.body.style.width = '';
+      window.scrollTo(0, this._lockedScrollY);
+      this._lockedScrollY = 0;
+    }
+  }
+
   getYearFromDate(date) {
     if (!date) return "";
     date = date + "";
@@ -64,6 +122,31 @@ class Utils {
       return parsed.toLocaleDateString('en-US', { timeZone: 'UTC', year: 'numeric', month: 'long', day: 'numeric' });
     }
     return date;
+  }
+
+  /**
+   * @method formatTime
+   * @description format a duration in seconds as a mm:ss (or h:mm:ss for durations
+   * over an hour) timestamp, for labeling transcript/caption cues
+   *
+   * @param {Number} seconds
+   *
+   * @returns {String}
+   */
+  formatTime(seconds) {
+    if (typeof seconds !== 'number' || isNaN(seconds) || seconds < 0) return '0:00';
+
+    const totalSeconds = Math.floor(seconds);
+    const h = Math.floor(totalSeconds / 3600);
+    const m = Math.floor((totalSeconds % 3600) / 60);
+    const s = totalSeconds % 60;
+    const paddedS = String(s).padStart(2, '0');
+
+    if (h > 0) {
+      const paddedM = String(m).padStart(2, '0');
+      return `${h}:${paddedM}:${paddedS}`;
+    }
+    return `${m}:${paddedS}`;
   }
 
   /**
@@ -157,6 +240,29 @@ class Utils {
     }
 
     return thumbnailUrl;
+  }
+
+  /**
+   * @method getAltText
+   * @description get accessible alt text for an image, using a fallback chain of
+   * alternativeHeadline, then description, then name. Checks the image's own linked
+   * data node first, then falls back to the same chain on the root item record if
+   * the image has none
+   *
+   * @param {Object} imageNode linked data node for the image
+   * @param {Object} rootNode linked data node for the root item record
+   *
+   * @returns {String}
+   */
+  getAltText(imageNode={}, rootNode={}) {
+    const firstValue = (value) => Array.isArray(value) ? (value[0] || '') : (value || '');
+
+    return firstValue(imageNode.alternativeHeadline) ||
+           firstValue(imageNode.description) ||
+           firstValue(imageNode.name) ||
+           firstValue(rootNode.alternativeHeadline) ||
+           firstValue(rootNode.description) ||
+           firstValue(rootNode.name) || '';
   }
 
   getCookie(name) {

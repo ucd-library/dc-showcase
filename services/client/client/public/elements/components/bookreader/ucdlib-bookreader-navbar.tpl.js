@@ -200,17 +200,35 @@ export function render() {
 return html`
   
 
-  <div class="br-nav-bar${this.fullscreen ? ' fullscreen' : ''}">
+  <div class="br-nav-bar${this.fullscreen ? ' fullscreen' : ''}" 
+    role="region"
+    aria-label="Book reader toolbar">
     <ucdlib-bookreader-slider></ucdlib-bookreader-slider>
-    <div class="controls">  
-      <div id="prev" @click="${this._prevPage}">
-        <ucdlib-icon icon="ucdlib-dams:fa-caret-left"></ucdlib-icon>
+    <div class="controls" role="region" aria-label="Pagination controls">  
+      <div id="prev"
+        role="button"
+        tabindex="0"
+        aria-label="Previous page"
+        @click="${this._prevPage}"
+        @keydown="${this._onPrevKeyDown}">
+        <ucdlib-icon icon="ucdlib-dams:fa-caret-left" aria-hidden="true"></ucdlib-icon>
       </div>
 
-      <span class="br-currentpage-override">${this.selectedPageLabel} of ${this.numPages}</span>
+      <span class="br-currentpage-override"
+        role="status"
+        aria-live="polite"
+        aria-atomic="true">
+        ${this.selectedPageLabel} of ${this.numPages}
+      </span>
 
-      <div id="next" style="width: 25px;" @click="${this._nextPage}">
-        <ucdlib-icon icon="ucdlib-dams:fa-caret-right"></ucdlib-icon>
+      <div id="next"
+        style="width: 25px;"
+        role="button"
+        tabindex="0"
+        aria-label="Next page"
+        @click="${this._nextPage}"
+        @keydown="${this._onNextKeyDown}">
+        <ucdlib-icon icon="ucdlib-dams:fa-caret-right" aria-hidden="true"></ucdlib-icon>
       </div>
     </div>
 
