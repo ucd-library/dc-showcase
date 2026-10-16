@@ -1,5 +1,6 @@
 const EsDataModel = require("../../lib/es-model.js");
 const schema = require("./schema.json");
+const uriUtils = require("../../lib/uri-utils.js");
 const { parseString } = require("xml2js");
 
 class PageSearch extends EsDataModel {
@@ -18,7 +19,7 @@ class PageSearch extends EsDataModel {
   async search(searchDocument, index) {
     if (!index) index = this.readIndexAlias;
 
-    let id = searchDocument.id;
+    let id = uriUtils.toUri(searchDocument.id);
     let query = {
       bool: {
         must: [
@@ -60,7 +61,7 @@ class PageSearch extends EsDataModel {
 
     return results.hits.hits.map((item) => {
       item._source.highlight = item.highlight;
-      return item._source;
+      return uriUtils.translateDoc(item._source);
     });
   }
 
@@ -170,7 +171,7 @@ class PageSearch extends EsDataModel {
 
   async get(id, opts={}, index) {
     if (!index) index = this.readIndexAlias;
-    id = id.replace(/\/fcr:metadata$/, '');
+    id = uriUtils.toUri(id.replace(/\/fcr:metadata$/, ''));
 
     let result = await this.esSearch({
         from: 0,
@@ -188,7 +189,7 @@ class PageSearch extends EsDataModel {
     );
 
     if( result.hits.total.value >= 1 ) {
-      result = result.hits.hits[0]._source;
+      result = uriUtils.translateDoc(result.hits.hits[0]._source);
     } else {
       return null;
     }

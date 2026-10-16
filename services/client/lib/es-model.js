@@ -3,6 +3,7 @@ const config = require('../config.js');
 const finSearch = require('./fin-search.js');
 const { logger } = require('./logger.js');
 const utils = require('./es-utils.js');
+const uriUtils = require('./uri-utils.js');
 
 /**
  * @class EsDataModel
@@ -46,13 +47,14 @@ class EsDataModel {
       ]
     }
 
+    this._filtersToUri(searchDocument);
     let esBody = finSearch.searchDocumentToEsBody(searchDocument);
     let esResult = await this.esSearch(esBody, {
       admin: options.admin,
       roles: options.roles,
       _source_excludes: options.clientMedia ? undefined : 'search'
     }, index);
-    let result = finSearch.esResultToDamsResult(esResult, searchDocument);
+    let result = uriUtils.translateDoc(finSearch.esResultToDamsResult(esResult, searchDocument));
 
     result.results.forEach(item => {
       if( item._source ) item = item._source;
@@ -93,7 +95,9 @@ class EsDataModel {
             should : [
               {term : {'@graph.identifier.raw' : id}},
               {term: {'@graph.@id': id}},
-              {term: {'@id': id}}
+              {term: {'@id': id}},
+              {term: {'@graph.@id': uriUtils.toUri(id)}},
+              {term: {'@id': uriUtils.toUri(id)}}
             ],
             minimum_should_match: 1
           }
@@ -108,14 +112,30 @@ class EsDataModel {
 
     if( result.hits.total.value < 1 ) return null;
 
-    result = result.hits.hits[0]._source;
+    result = uriUtils.translateDoc(result.hits.hits[0]._source);
     if( opts.compact ) this.utils.compactAllTypes(result);
     if( opts.singleNode ) {
       this.utils.hydrateClientMedia(result);
-      result['@graph'] = this.utils.singleNode(id, result['@graph']);
+      result['@graph'] = this.utils.singleNode(uriUtils.normalizePath(id), result['@graph']);
     }
 
     return result;
+  }
+
+  /**
+   * @method _filtersToUri
+   * @description map site path filter values on id fields to the full
+   * record URIs stored in ES.
+   *
+   * @param {Object} searchDocument mutated in place
+   */
+  _filtersToUri(searchDocument={}) {
+    let idFields = ['@id', '@graph.@id', '@graph.isPartOf.@id'];
+    for( let field of idFields ) {
+      let filter = searchDocument.filters?.[field];
+      if( !filter || !Array.isArray(filter.value) ) continue;
+      filter.value = filter.value.map(v => uriUtils.toUri(v));
+    }
   }
 
   /**

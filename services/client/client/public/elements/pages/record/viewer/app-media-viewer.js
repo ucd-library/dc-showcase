@@ -230,7 +230,7 @@ export default class AppMediaViewer extends Mixin(LitElement)
       mediaType = 'image';
     }
 
-    if( selectedMediaGroup.id === '/item/ark:/87293/9191/images' ) {
+    if( selectedMediaGroup.id === '/item/ark:/87293/9191/imagelist' ) {
       renderAsBr = false;
       mediaType = 'image';
     }

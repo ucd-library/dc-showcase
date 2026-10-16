@@ -23,9 +23,9 @@ class RecordGraph {
     for( let item of this.data['@graph'] ) {
       item.id = item['@id'];
 
-      // root clientMedia is keyed by sameAs
-      if( item.sameAs && clientMedia[item.sameAs] ) {
-        item.clientMedia = clientMedia[item.sameAs];
+      // root clientMedia is keyed by @id
+      if( clientMedia[item['@id']] ) {
+        item.clientMedia = clientMedia[item['@id']];
       }
 
       // if the node id is the main data id, this is the root

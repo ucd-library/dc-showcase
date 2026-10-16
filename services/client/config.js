@@ -63,6 +63,10 @@ let config = {
     }
   },
 
+  uri: {
+    baseUri: process.env.RECORD_BASE_URI || 'https://digital.ucdavis.edu'
+  },
+
   // collection itemCount sync - see lib/item-count-cron.js
   itemCountCron: {
     enabled: process.env.ITEM_COUNT_CRON_ENABLED !== 'false',

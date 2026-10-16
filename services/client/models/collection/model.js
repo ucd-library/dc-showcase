@@ -4,6 +4,7 @@ const { logger } = require('../../lib/logger.js');
 const schema = require('./schema.json');
 const clientEdits = require('../client-edits');
 const clientEditsModel = clientEdits.model;
+const uriUtils = require('../../lib/uri-utils.js');
 
 class CollectionsModel extends EsDataModel {
 
@@ -119,7 +120,7 @@ class CollectionsModel extends EsDataModel {
         query: {
           bool : {
             must : [
-              {term: {'@graph.isPartOf.@id': id}}
+              {term: {'@graph.isPartOf.@id': uriUtils.toUri(id)}}
             ]
           }
         }
@@ -183,7 +184,7 @@ class CollectionsModel extends EsDataModel {
 
     let map = {};
     for( let hit of result.hits.hits ) {
-      map[hit._source['@id']] = Array.isArray(hit._source.name) ? hit._source.name[0] : hit._source.name;
+      map[uriUtils.toPath(hit._source['@id'])] = Array.isArray(hit._source.name) ? hit._source.name[0] : hit._source.name;
     }
 
     return map;
