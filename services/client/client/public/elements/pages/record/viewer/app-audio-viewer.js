@@ -196,7 +196,7 @@ export default class AppAudioViewer extends Mixin(LitElement)
 
   async _loadAudio() {
     let sourceEle = this.shadowRoot.querySelector('#audio_player source');
-    // argonath-indexed items carry a playable url (a /cask/file/ silver path)
+    // argonath items carry a cask url
     sourceEle.src = this.media.clientMedia?.audio?.url || this.media['@id'];
     sourceEle.type = this.media.fileFormat || this.media.hasMimeType || this.media.encodingFormat || '';
 

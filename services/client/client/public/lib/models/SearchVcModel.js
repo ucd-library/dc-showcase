@@ -32,7 +32,8 @@ class SearchVcModel extends BaseModel {
     e.payload.results.forEach((result) => {
       if( !result.root ) return;
       let thumbnailUrl = utils.getThumbnailFromClientMedia(
-        result.clientMedia
+        result.clientMedia,
+        { displayImage: result.displayImage }
       );
 
       // TODO could belong to multiple collections.. which should be listed? or collectionIds as array type?
@@ -86,9 +87,12 @@ class SearchVcModel extends BaseModel {
       }
 
       let size = mediaGroups.find(g => g.clientMedia?.images?.original?.size);
+      let displayImages = result.displayImage?.images || {};
       if( size ) {
         size = size.clientMedia.images.original.size;
-      } else { 
+      } else if( displayImages.large?.size || displayImages.medium?.size ) {
+        size = displayImages.large?.size || displayImages.medium?.size;
+      } else {
         size = {};
       }
       if( Array.isArray(size) ) size = size[0];

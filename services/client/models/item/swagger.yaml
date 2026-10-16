@@ -23,6 +23,31 @@ paths:
               schema:
                 type: object
                 properties:
+                  clientMedia:
+                    type: object
+                    description: Media renditions keyed by gold record @id (node sameAs)
+                    additionalProperties:
+                      type: object
+                      properties:
+                        images:
+                          type: object
+                          description: small, medium, large, tiled, ocr
+                        pages:
+                          type: array
+                          items:
+                            type: object
+                        download:
+                          oneOf:
+                            - type: object
+                            - type: array
+                  displayImage:
+                    type: object
+                    description: Main image renditions, for search results
+                    properties:
+                      '@id':
+                        type: string
+                      images:
+                        type: object
                   '@graph':
                     type: array
                     items:
@@ -38,25 +63,9 @@ paths:
                           type: array
                           items:
                             type: string
-                        clientMedia:
-                          type: object
-                          properties:
-                            images:
-                              type: object
-                              properties:
-                                small:
-                                  type: object
-                                  properties:
-                                    size:
-                                      type: object
-                                      properties:
-                                        width:
-                                          type: string
-                                        height:
-                                          type: string
-                                    url:
-                                      type: string
-                                # Add other image types (tiled, original, large, medium, ocr) here
+                        sameAs:
+                          type: string
+                          description: Gold record @id; key into root clientMedia
                         '@id':
                           type: string
                         lastModified:
