@@ -53,8 +53,24 @@ let config = {
         'roles', '@graph.indexableContent',
         '@graph.createdBy', '@graph.lastModifiedBy', '@graph._',
         '@graph.image', '@graph.textIndexable', '@graph.lastModified'
+      ],
+      // search results skip per-file media
+      excludeSearch: [
+        'roles', '@graph.indexableContent',
+        '@graph.createdBy', '@graph.lastModifiedBy', '@graph._', '@graph.textIndexable',
+        'clientMedia'
       ]
     }
+  },
+
+  uri: {
+    baseUri: process.env.RECORD_BASE_URI || 'https://digital.ucdavis.edu'
+  },
+
+  // collection itemCount sync - see lib/item-count-cron.js
+  itemCountCron: {
+    enabled: process.env.ITEM_COUNT_CRON_ENABLED !== 'false',
+    interval: parseInt(process.env.ITEM_COUNT_CRON_INTERVAL || String(1000 * 60 * 5))
   },
 
   // simplified stand-in for fin's FinAC role names - see lib/es-model.js

@@ -42,7 +42,8 @@ app.use(async (req, res, next) => {
     return next();
   }
 
-  let caskPath = req.path.replace(/^\/cask(\/file)?/, '');
+  // /cask/api/fs, /cask/file, or bare /cask
+  let caskPath = req.path.replace(/^\/cask(\/api\/fs|\/file)?/, '');
   req.url = '/api/fs' + caskPath;
   logger.debug(`Rewriting ${req.path} -> ${req.url} to ${config.caskfs.url} for CaskFS request`);
   proxy.web(req, res, { target: config.caskfs.url, headers: caskClient.authHeaders() });
@@ -53,8 +54,11 @@ app.use(async (req, res, next) => {
     return next();
   }
 
-  let parts = req.path.split(/\/-\/.*$/);
-  let caskPath = parts[0].replace('/iiif', '');
+  // split /iiif/<cask path>/-/<iiif query>
+  let iiifPath = req.path.replace(/^\/iiif/, '');
+  let sep = iiifPath.indexOf('/-/');
+  let caskPath = sep === -1 ? iiifPath : iiifPath.slice(0, sep);
+  let iiifQuery = sep === -1 ? '' : iiifPath.slice(sep + 2);
   let metadata;
   try {
     metadata = await caskClient.getFileMetadata(caskPath);
@@ -63,7 +67,6 @@ app.use(async (req, res, next) => {
     return res.status(500).send('Error finding cask file for IIIF request');
   }
   console.log('metadata', metadata);
-  let iiifQuery = parts[1];
   let casPath = caskClient.casRelativePath(metadata.hash_value);
   console.log('casPath', casPath, 'iiifQuery', iiifQuery);
 

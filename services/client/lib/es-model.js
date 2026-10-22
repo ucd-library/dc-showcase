@@ -3,6 +3,7 @@ const config = require('../config.js');
 const finSearch = require('./fin-search.js');
 const { logger } = require('./logger.js');
 const utils = require('./es-utils.js');
+const uriUtils = require('./uri-utils.js');
 
 /**
  * @class EsDataModel
@@ -32,6 +33,7 @@ class EsDataModel {
    *
    * @param {Object} searchDocument
    * @param {Boolean} options.debug will return searchDocument and esBody in result
+   * @param {Boolean} options.clientMedia include root clientMedia (excluded by default)
    *
    * @returns {Promise} resolves to search result
    */
@@ -45,14 +47,22 @@ class EsDataModel {
       ]
     }
 
+    this._filtersToUri(searchDocument);
     let esBody = finSearch.searchDocumentToEsBody(searchDocument);
-    let esResult = await this.esSearch(esBody, {admin: options.admin, roles: options.roles}, index);
-    let result = finSearch.esResultToDamsResult(esResult, searchDocument);
+    let esResult = await this.esSearch(esBody, {
+      admin: options.admin,
+      roles: options.roles,
+      _source_excludes: options.clientMedia ? undefined : 'search'
+    }, index);
+    let result = uriUtils.translateDoc(finSearch.esResultToDamsResult(esResult, searchDocument));
 
     result.results.forEach(item => {
       if( item._source ) item = item._source;
       if( options.compact ) this.utils.compactAllTypes(item);
-      if( options.singleNode ) item['@graph'] = this.utils.singleNode(item['@id'], item['@graph']);
+      if( options.singleNode ) {
+        this.utils.hydrateClientMedia(item);
+        item['@graph'] = this.utils.singleNode(item['@id'], item['@graph']);
+      }
     });
 
     if( options.debug ) {
@@ -85,7 +95,9 @@ class EsDataModel {
             should : [
               {term : {'@graph.identifier.raw' : id}},
               {term: {'@graph.@id': id}},
-              {term: {'@id': id}}
+              {term: {'@id': id}},
+              {term: {'@graph.@id': uriUtils.toUri(id)}},
+              {term: {'@id': uriUtils.toUri(id)}}
             ],
             minimum_should_match: 1
           }
@@ -100,11 +112,30 @@ class EsDataModel {
 
     if( result.hits.total.value < 1 ) return null;
 
-    result = result.hits.hits[0]._source;
+    result = uriUtils.translateDoc(result.hits.hits[0]._source);
     if( opts.compact ) this.utils.compactAllTypes(result);
-    if( opts.singleNode ) result['@graph'] = this.utils.singleNode(id, result['@graph']);
+    if( opts.singleNode ) {
+      this.utils.hydrateClientMedia(result);
+      result['@graph'] = this.utils.singleNode(uriUtils.normalizePath(id), result['@graph']);
+    }
 
     return result;
+  }
+
+  /**
+   * @method _filtersToUri
+   * @description map site path filter values on id fields to the full
+   * record URIs stored in ES.
+   *
+   * @param {Object} searchDocument mutated in place
+   */
+  _filtersToUri(searchDocument={}) {
+    let idFields = ['@id', '@graph.@id', '@graph.isPartOf.@id'];
+    for( let field of idFields ) {
+      let filter = searchDocument.filters?.[field];
+      if( !filter || !Array.isArray(filter.value) ) continue;
+      filter.value = filter.value.map(v => uriUtils.toUri(v));
+    }
   }
 
   /**
@@ -140,6 +171,8 @@ class EsDataModel {
       delete options._source_excludes;
     } else if( options._source_excludes === 'compact' ) {
       options._source_excludes = config.elasticsearch.fields.excludeCompact.join(',');
+    } else if( options._source_excludes === 'search' ) {
+      options._source_excludes = config.elasticsearch.fields.excludeSearch.join(',');
     } else if( Array.isArray(options._source_excludes) ) {
       options._source_excludes = options._source_excludes.join(',');
     } else {

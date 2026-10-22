@@ -109,7 +109,10 @@ export default class AppMediaViewer extends Mixin(LitElement)
 
     if (!mediaGroups || !mediaGroups.length || !mediaGroups.filter(m => m['@type'].length > 0).length ) {
       // try to at least load a single image as fallback
-      let thumbnailUrl = utils.getThumbnailFromClientMedia(e?.selectedRecord?.clientMedia);
+      let thumbnailUrl = utils.getThumbnailFromClientMedia(
+        e?.selectedRecord?.clientMedia,
+        { displayImage: e?.selectedRecord?.graph?.displayImage }
+      );
       if( thumbnailUrl ) {
         this.mediaType = 'image';
       } else {
@@ -227,7 +230,7 @@ export default class AppMediaViewer extends Mixin(LitElement)
       mediaType = 'image';
     }
 
-    if( selectedMediaGroup.id === '/item/ark:/87293/9191/images' ) {
+    if( selectedMediaGroup.id === '/item/ark:/87293/9191/imagelist' ) {
       renderAsBr = false;
       mediaType = 'image';
     }

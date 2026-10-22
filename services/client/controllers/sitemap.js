@@ -1,4 +1,5 @@
 const config = require('../config.js');
+const uriUtils = require('../lib/uri-utils.js');
 let collections = require('../models/collection/index.js');
 let items = require('../models/item/index.js');
 
@@ -115,7 +116,7 @@ ${sitemap}`);
 
     let hits = sitemaps.hits.hits || [];
     sitemaps = hits.map(result => `<sitemap>
-        <loc>${config.server.url}/sitemap-${result._id.replace('/collection/','')}.xml</loc>
+        <loc>${config.server.url}/sitemap-${uriUtils.toPath(result._id).replace('/collection/','')}.xml</loc>
     </sitemap>`);
 
         return `<?xml version="1.0" encoding="UTF-8"?>
@@ -144,7 +145,7 @@ ${sitemap}`);
     let query = {
       bool: {
         filter: [
-          {term: {'@graph.isPartOf.@id': `/collection/${id}`}}
+          {term: {'@graph.isPartOf.@id': uriUtils.toUri(`/collection/${id}`)}}
         ]
       }
     };
@@ -192,14 +193,14 @@ ${sitemap}`);
     }, {scroll: time});
 
     let sent = result.hits.hits.length;
-    result.hits.hits.forEach(result => resp.write(`${config.server.url}${result._id}\n`));
+    result.hits.hits.forEach(result => resp.write(`${config.server.url}${uriUtils.toPath(result._id)}\n`));
     while( sent > 0 ) {
       result = await items.esScroll({
         scroll_id: result._scroll_id,
         scroll: time
       });
 
-      result.hits.hits.forEach(result => resp.write(`${config.server.url}${result._id}\n`));
+      result.hits.hits.forEach(result => resp.write(`${config.server.url}${uriUtils.toPath(result._id)}\n`));
       sent = result.hits.hits.length;
     }
 
@@ -218,7 +219,7 @@ ${sitemap}`);
    */
   _writeResult(resp, result) {
     resp.write(`<url>
-        <loc>${config.server.url}${result._id}</loc>
+        <loc>${config.server.url}${uriUtils.toPath(result._id)}</loc>
         <changefreq>weekly</changefreq>
         <priority>.5</priority>
     </url>\n`);

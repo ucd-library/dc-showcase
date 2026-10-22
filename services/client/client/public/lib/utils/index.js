@@ -199,7 +199,21 @@ class Utils {
     return null;
   }
 
-  getThumbnailFromClientMedia(clientMedia={}) {
+  /**
+   * @method getThumbnailFromClientMedia
+   * @description medium thumbnail url for a record. Uses the document's
+   * displayImage when given, else crawls clientMedia.
+   *
+   * @param {Object} clientMedia ClientMedia instance
+   * @param {Object} opts
+   * @param {Object} opts.displayImage es document displayImage
+   *
+   * @returns {String}
+   */
+  getThumbnailFromClientMedia(clientMedia={}, opts={}) {
+    let displayUrl = opts.displayImage?.images?.medium?.url;
+    if( displayUrl ) return displayUrl;
+
     let thumbnailUrl = "";
     let graph = clientMedia.graph;
 
