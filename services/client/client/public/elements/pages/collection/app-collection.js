@@ -48,6 +48,7 @@ class AppCollection extends Mixin(LitElement)
       itemDefaultDisplay : { type: String },
       itemEdits : { type: Array },
       showDisclaimer : { type: Boolean },
+      visibility : { type: String },
       showModal : { type: Boolean },
       modalTitle : { type: String },
       modalContent : { type: String },
@@ -234,6 +235,8 @@ class AppCollection extends Mixin(LitElement)
     this.itemDefaultDisplay = utils.itemDisplayType.brTwoPage; // one, list.. for admin pref on BR display type for items in this collection
     this.itemEdits = [];
     this.showDisclaimer = false;
+    this.visibility = 'private';
+    this.savedVisibility = 'private';
     this.showModal = false;
     this.modalTitle = 'Welcome to the new Digital Collections!';
     this.modalContent = `<p>We've recently updated this website, so some webpage addresses (URLs) may have changed. Please search within this collection for the item you're looking for.</p> <p>We apologize for the inconvenience.</p>`;
@@ -328,7 +331,8 @@ class AppCollection extends Mixin(LitElement)
     this._updateDisplayData(featuredImage);
 
 
-    await this.FcAppConfigModel.saveCollectionDisplayData(this.collectionId, this.displayData);
+    await this.FcAppConfigModel.saveCollectionDisplayData(this.collectionId, this.displayData, {visibility: this.visibility});
+    this.savedVisibility = this.visibility;
     if( fileElement && featuredImage ) {
       await this.FcAppConfigModel.saveCollectionFeaturedImage(this.collectionId, featuredImage);
       fileElement.value = '';
@@ -371,7 +375,17 @@ class AppCollection extends Mixin(LitElement)
   _onCancelEditClicked(e) {
     if( !this.isUiAdmin ) return;
     this.editMode = false;
+    this.visibility = this.savedVisibility;
     document.querySelector('#file-upload').value = '';
+  }
+
+  /**
+   * @method _onVisibilityToggle
+   * @description admin ui, switch between public and private. Saved with the save button.
+   */
+  _onVisibilityToggle() {
+    if( !this.isUiAdmin ) return;
+    this.visibility = this.visibility === 'public' ? 'private' : 'public';
   }
 
   /**
@@ -453,6 +467,9 @@ class AppCollection extends Mixin(LitElement)
     this.itemDefaultDisplay = collectionEdits.itemDefaultDisplay || utils.itemDisplayType.brTwoPage;
 
     this.showDisclaimer = collectionEdits.showDisclaimer || false;
+
+    this.visibility = collectionEdits.visibility || 'private';
+    this.savedVisibility = this.visibility;
 
     this.savedItems = collectionEdits.exampleOfWork || [];
     if( !Array.isArray(this.savedItems) ) this.savedItems = [this.savedItems];
