@@ -76,10 +76,9 @@ export default class DamsHighlightedCollection extends Mixin(LitElement).with(
   async _getCollection(id) {
     let res = await this.CollectionModel.get(id);
 
-    let clientEditsId = res.vcData.clientEdits?.['@id'];
-    let overriddenFeatureImage =  res.vcData.clientEdits?.thumbnailUrl?.['@id'];
-    if( clientEditsId && overriddenFeatureImage ) {
-      this.imgSrc = clientEditsId + '/featuredImage.jpg';
+    let overriddenFeatureImage = res.vcData.clientEdits?.thumbnailUrl?.['@id'];
+    if( overriddenFeatureImage ) {
+      this.imgSrc = overriddenFeatureImage;
     } else if( res.vcData.images ) {
       let images = res.vcData.images;
       this.imgSrc = images.medium ? images.medium.url : images.original.url;

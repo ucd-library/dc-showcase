@@ -216,10 +216,9 @@ class AppRecord extends Mixin(LitElement)
     this.renderedCollectionId = e.id;
     this.collectionId = e.id;
 
-    let clientEditsId = e.vcData.clientEdits?.['@id'];
-    let overriddenFeatureImage =  e.vcData.clientEdits?.thumbnailUrl?.['@id'];
-    if( clientEditsId && overriddenFeatureImage ) {
-      this.collectionImg = clientEditsId + '/featuredImage.jpg';
+    let overriddenFeatureImage = e.vcData.clientEdits?.thumbnailUrl?.['@id'];
+    if( overriddenFeatureImage ) {
+      this.collectionImg = overriddenFeatureImage;
     } else {
       this.collectionImg = e.vcData?.images?.small?.url                   
       || e.vcData?.images?.medium?.url 

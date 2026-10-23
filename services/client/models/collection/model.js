@@ -2,8 +2,7 @@ const EsDataModel = require('../../lib/es-model.js');
 const config = require('../../config.js');
 const { logger } = require('../../lib/logger.js');
 const schema = require('./schema.json');
-const clientEdits = require('../client-edits');
-const clientEditsModel = clientEdits.model;
+const appConfigModel = require('../app-config').model;
 const uriUtils = require('../../lib/uri-utils.js');
 
 class CollectionsModel extends EsDataModel {
@@ -62,12 +61,18 @@ class CollectionsModel extends EsDataModel {
     return resp;
   }
 
+  /**
+   * @method _appendClientEdits
+   * @description Attach the collection's display edits as `clientEdits`.
+   *
+   * @param {Object} collection collection doc, mutated in place
+   */
   async _appendClientEdits(collection) {
     if( !collection ) return collection;
-    let resp = await clientEditsModel.get(collection['@id']);
+    let resp = await appConfigModel.getCollectionEdits(collection['@id']);
 
     if( resp?.collection && Object.keys(resp.collection).length ) {
-      collection['@graph'].push(resp.collection);
+      collection.clientEdits = resp.collection;
     }
   }
 

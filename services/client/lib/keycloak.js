@@ -97,7 +97,7 @@ class KeycloakUtils {
 
     let resp;
     try {
-      resp = await fetch(`${config.oidc.host}/realms/${config.oidc.realm}/protocol/openid-connect/userinfo`, {
+      resp = await fetch(`${config.oidc.host}/protocol/openid-connect/userinfo`, {
         signal: controller.signal,
         headers: { authorization: 'Bearer '+token }
       });
@@ -116,6 +116,25 @@ class KeycloakUtils {
     setTimeout(() => this.tokenCache.delete(token), config.oidc.tokenCacheTTL);
 
     return result;
+  }
+
+  /**
+   * @method getClientRoles
+   * @description Client roles from the access token's resource_access claim.
+   * Userinfo doesn't include them; only call after the token is verified.
+   *
+   * @param {String} token access token JWT
+   *
+   * @returns {Array<String>}
+   */
+  getClientRoles(token) {
+    try {
+      let payload = JSON.parse(Buffer.from(token.split('.')[1], 'base64url').toString());
+      let roles = payload.resource_access?.[config.oidc.clientId]?.roles;
+      return Array.isArray(roles) ? roles : [];
+    } catch(e) {
+      return [];
+    }
   }
 
   /**
@@ -141,6 +160,7 @@ class KeycloakUtils {
       user.realmRoles.forEach(role => roles.add(role));
       delete user.realmRoles;
     }
+    this.getClientRoles(token).forEach(role => roles.add(role));
 
     user.roles = Array.from(roles).filter(role => !config.oidc.roleIgnoreList.includes(role));
     req.user = user;

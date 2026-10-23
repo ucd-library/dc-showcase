@@ -44,7 +44,7 @@ function init(app) {
       callback : '/auth/callback',
       login : '/auth/login',
       logout : '/auth/logout',
-      postLogoutRedirect : '/auth/postLogoutRedirect'
+      postLogoutRedirect : '/'
     },
     authorizationParams: {
       response_type: 'code',

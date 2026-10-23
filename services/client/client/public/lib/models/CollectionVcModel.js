@@ -45,10 +45,7 @@ class CollectionVcModel {
 
     if( rootNode.subjects && !Array.isArray(rootNode.subjects) ) rootNode.subjects = [rootNode.subjects];
 
-    let clientEdits = {};
-    try {
-      clientEdits = e.payload.data['@graph'].find(g => g['@shortType'] === 'ClientEdit' || g['@shortType'].includes('ClientEdit'));
-    } catch(e) {}
+    let clientEdits = e.payload?.data?.clientEdits || {};
 
     let publishedDateRange = '';
     if( rootNode.publishedDateRange?.minYear && rootNode.publishedDateRange?.maxYear ) {

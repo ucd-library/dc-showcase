@@ -15,6 +15,26 @@ const IIIF_PATH_REGEX = /^\/iiif\/(.*)$/i;
 // This is a HACK
 const IIIF_TIF_PATH = '/images/tiled.tif';
 
+// proxied caskfs/iiif paths are read-only
+const READ_METHODS = ['GET', 'HEAD'];
+
+/**
+ * @function rejectWrite
+ * @description Send a 405 for any non-read request to a proxied file path.
+ * These proxies present the gateway's trusted CaskFS identity, so writes must
+ * go through the client app's protected api instead.
+ *
+ * @param {Object} req express request
+ * @param {Object} res express response
+ *
+ * @returns {Boolean} true if the request was rejected
+ */
+function rejectWrite(req, res) {
+  if( READ_METHODS.includes(req.method) ) return false;
+  res.set('Allow', READ_METHODS.join(', ')).status(405).send('Method not allowed');
+  return true;
+}
+
 const app = express();
 const proxy = httpProxy.createProxyServer({ xfwd: true });
 
@@ -41,6 +61,7 @@ app.use(async (req, res, next) => {
   if( !req.path.startsWith('/cask/') ) {
     return next();
   }
+  if( rejectWrite(req, res) ) return;
 
   // /cask/api/fs, /cask/file, or bare /cask
   let caskPath = req.path.replace(/^\/cask(\/api\/fs|\/file)?/, '');
@@ -53,6 +74,7 @@ app.use(async (req, res, next) => {
   if( !IIIF_PATH_REGEX.test(req.path) ) {
     return next();
   }
+  if( rejectWrite(req, res) ) return;
 
   // split /iiif/<cask path>/-/<iiif query>
   let iiifPath = req.path.replace(/^\/iiif/, '');
@@ -80,6 +102,7 @@ app.use(async (req, res, next) => {
   if( !GCS_PATH_REGEX.test(req.path) ) {
     return next();
   }
+  if( rejectWrite(req, res) ) return;
 
   let [itemPath, subPath] = req.path.replace('/fcrepo/rest', '').split('/svc:gcs/');
   // subpath still has old bucket name
@@ -97,6 +120,7 @@ app.use(async (req, res, next) => {
 app.use(async (req, res, next) => {
   let match = req.path.match(FCREPO_PATH_REGEX);
   if( !match ) return next();
+  if( rejectWrite(req, res) ) return;
 
   let [type, ark, subPath] = match;
 
@@ -108,8 +132,32 @@ app.use(async (req, res, next) => {
 });
 
 
-app.use((req, res) => {
-  proxy.web(req, res, { target: config.client.url });
+/**
+ * @function clientAuthHeaders
+ * @description Bearer header for the logged-in user's access token, refreshing it if expired.
+ * Requests that already send a token, or have no session, get no header.
+ *
+ * @param {Object} req express request
+ *
+ * @returns {Promise<Object>} headers to add to the client proxy request
+ */
+async function clientAuthHeaders(req) {
+  if( req.headers.authorization || !req.oidc?.isAuthenticated() ) return {};
+  let accessToken = req.oidc.accessToken;
+  if( !accessToken ) return {};
+  if( accessToken.isExpired() ) {
+    try {
+      accessToken = await accessToken.refresh();
+    } catch(e) {
+      logger.warn(`Access token refresh failed: ${e.message}`);
+      return {};
+    }
+  }
+  return { authorization: 'Bearer ' + accessToken.access_token };
+}
+
+app.use(async (req, res) => {
+  proxy.web(req, res, { target: config.client.url, headers: await clientAuthHeaders(req) });
 });
 
 app.listen(config.port, () => {

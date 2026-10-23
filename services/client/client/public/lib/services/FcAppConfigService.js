@@ -9,6 +9,7 @@ class FcAppConfigService extends BaseService {
     this.store = FcAppConfigStore;
 
     this.baseApiUrl = '/api/application/ucd-lib-client';
+    this.appConfigApiUrl = '/api/app-config';
   }
 
   getDefaultImagesConfig() {
@@ -75,15 +76,15 @@ class FcAppConfigService extends BaseService {
     });
   }
 
-  async saveCollectionDisplayData(id, displayData) {    
+  async saveCollectionDisplayData(id, displayData, opts={}) {
     return this.request({
-      url : `${this.baseApiUrl}${id}`,
+      url : `${this.appConfigApiUrl}${id}`,
       fetchOptions : {
         method : 'PUT',
         headers : {
-          'Content-Type' : 'application/ld+json'
+          'Content-Type' : 'application/json'
         },
-        body : JSON.stringify(displayData)
+        body : JSON.stringify({edit : displayData, visibility : opts.visibility})
       },
       checkCached : () => null,
       onLoading : null,
@@ -94,14 +95,14 @@ class FcAppConfigService extends BaseService {
 
   async saveCollectionFeaturedImage(id, featuredImage) {
     if( featuredImage ) {
-      await fetch(`${this.baseApiUrl}${id}/featuredImage.jpg`, {
-        method : 'PUT',
+      let resp = await fetch(`${this.appConfigApiUrl}${id}/featured-image`, {
+        method : 'POST',
         headers : {
-            'Content-Type' : 'image/jpg',
+          'Content-Type' : featuredImage.type || 'image/jpeg'
         },
-        body: featuredImage,
-        duplex: 'half'
-      }); 
+        body : featuredImage
+      });
+      if( !resp.ok ) console.warn('Featured image upload failed', resp.status);
     }
   }
 
@@ -136,13 +137,13 @@ class FcAppConfigService extends BaseService {
 
   async saveItemDisplayData(id, displayData) {
     return this.request({
-      url : `${this.baseApiUrl}${id}`,
+      url : `${this.appConfigApiUrl}${id}`,
       fetchOptions : {
         method : 'PUT',
         headers : {
-          'Content-Type' : 'application/ld+json'
+          'Content-Type' : 'application/json'
         },
-        body : JSON.stringify(displayData)
+        body : JSON.stringify({edit : displayData})
       },
       checkCached : () => null,
       onLoading : null,

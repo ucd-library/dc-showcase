@@ -86,8 +86,8 @@ let config = {
   },
 
   oidc: {
-    host: process.env.OIDC_BASE_URL || 'https://auth.library.ucdavis.edu',
-    realm: process.env.OIDC_REALM || 'internal',
+    // issuer url, includes the realm
+    host: process.env.OIDC_BASE_URL || 'https://auth.library.ucdavis.edu/realms/internal',
     clientId: process.env.OIDC_CLIENT_ID,
     clientSecret: process.env.OIDC_CLIENT_SECRET,
     roleIgnoreList: [

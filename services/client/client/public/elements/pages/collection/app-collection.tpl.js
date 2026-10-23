@@ -292,6 +292,39 @@ export default function render() {
       right: 3rem;
       top: calc(170px + 3rem);
       z-index: 500;
+      display: flex;
+      flex-direction: column;
+      align-items: flex-end;
+    }
+
+    .admin-edit .visibility-toggle {
+      margin-top: .375rem;
+    }
+
+    .admin-edit .visibility-toggle button {
+      border: none;
+      padding: 0 1.5rem;
+      font-family: inherit;
+      display: inline-flex;
+      align-items: center;
+      justify-content: flex-end;
+      gap: .5rem;
+    }
+
+    .admin-edit .visibility-toggle ucdlib-icon {
+      width: 20px;
+      height: 20px;
+      margin: 0;
+      padding: 0;
+      fill: var(--color-aggie-gold);
+    }
+
+    .admin-edit .visibility-toggle button:hover {
+      background-color: var(--color-aggie-blue);
+    }
+
+    .admin-edit .visibility-toggle button:focus {
+      color: white;
     }
 
     .admin-edit .icon-wrapper {
@@ -603,14 +636,22 @@ export default function render() {
       </div>
 
       <div class="right-panel">
-        <div class="icon-wrapper" ?hidden="${this.editMode || !this.isUiAdmin}" @click="${this._onEditClicked}">
-          <ucdlib-icon icon="ucdlib-dams:fa-pen"></ucdlib-icon>
+        <div class="icon-row">
+          <div class="icon-wrapper" ?hidden="${this.editMode || !this.isUiAdmin}" @click="${this._onEditClicked}">
+            <ucdlib-icon icon="ucdlib-dams:fa-pen"></ucdlib-icon>
+          </div>
+          <div class="icon-wrapper edit" ?hidden="${!this.editMode || !this.isUiAdmin}" @click="${this._onSaveClicked}">
+            <ucdlib-icon icon="ucdlib-dams:fa-floppy-disk"></ucdlib-icon>
+          </div>
+          <div class="icon-wrapper edit" ?hidden="${!this.editMode || !this.isUiAdmin}" @click="${this._onCancelEditClicked}">
+            <ucdlib-icon icon="ucdlib-dams:fa-xmark"></ucdlib-icon>
+          </div>
         </div>
-        <div class="icon-wrapper edit" ?hidden="${!this.editMode || !this.isUiAdmin}" @click="${this._onSaveClicked}">
-          <ucdlib-icon icon="ucdlib-dams:fa-floppy-disk"></ucdlib-icon>
-        </div>
-        <div class="icon-wrapper edit" ?hidden="${!this.editMode || !this.isUiAdmin}" @click="${this._onCancelEditClicked}">
-          <ucdlib-icon icon="ucdlib-dams:fa-xmark"></ucdlib-icon>
+        <div class="visibility-toggle" ?hidden="${!this.editMode || !this.isUiAdmin}">
+          <button class="file-upload-label" @click="${this._onVisibilityToggle}">
+            <ucdlib-icon icon="ucdlib-dams:${this.visibility === 'public' ? 'fa-lock' : 'fa-unlock'}"></ucdlib-icon>
+            <span>Set ${this.visibility === 'public' ? 'Private' : 'Public'}</span>
+          </button>
         </div>
       </div>
     </div>
