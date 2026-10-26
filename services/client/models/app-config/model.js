@@ -1,4 +1,5 @@
 const pg = require('../../lib/pg.js');
+const esClient = require('../../lib/es-client.js');
 const config = require('../../config.js');
 const uriUtils = require('../../lib/uri-utils.js');
 
@@ -147,15 +148,22 @@ class AppConfigModel {
 
   /**
    * @method featuredImagePath
-   * @description The CaskFS path a collection's featured image is written to.
+   * @description The CaskFS path a collection's featured image is written to, in its gold folder.
+   * The folder is the goldPath argonath indexes on the collection document.
    *
    * @param {String} id collection path or URI
    * @param {String} ext file extension, e.g. '.jpg'
    *
-   * @returns {String} e.g. /app-config/collection/ark/87287/d7abc/featured-image.jpg
+   * @returns {Promise<String>} e.g. /gold/digital-dev/haeger/featured-image.jpg
    */
-  featuredImagePath(id, ext) {
-    return '/app-config' + uriUtils.toPath(uriUtils.toUri(id)).replace(/:/g, '') + '/featured-image' + ext;
+  async featuredImagePath(id, ext) {
+    let uri = uriUtils.toUri(id);
+    let doc = await esClient.get({index: 'collection-read', id: uri}).catch(() => null);
+    let root = (doc?._source?.['@graph'] || []).find(node => node['@id'] === uri) || {};
+    if( !root.goldPath ) {
+      throw this._badRequest('collection has no goldPath, reindex it: '+id);
+    }
+    return root.goldPath + '/featured-image' + ext;
   }
 
   /**

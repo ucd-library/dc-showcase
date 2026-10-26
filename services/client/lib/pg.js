@@ -10,6 +10,7 @@ class PG {
     this.client = new Pool({
       host: config.pg.host,
       user: config.pg.user,
+      password: config.pg.password,
       port: config.pg.port,
       database: config.pg.database,
       options: '--search_path=' + config.pg.searchPath.join(','),

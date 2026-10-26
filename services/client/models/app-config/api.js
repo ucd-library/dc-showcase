@@ -102,7 +102,7 @@ router.post(/^\/collection\/.+\/featured-image$/, protect, async (req, res) => {
     if( !ext ) return res.status(400).json({error: true, message: 'unsupported image type: '+mimeType});
 
     let id = idFromPath(req, '/featured-image');
-    let caskPath = model.featuredImagePath(id, ext);
+    let caskPath = await model.featuredImagePath(id, ext);
     await cask.write(caskPath, req, {mimeType});
     res.json(await model.setFeaturedImage(id, caskPath, {user: editor(req)}));
   } catch(e) {
