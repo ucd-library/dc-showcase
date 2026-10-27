@@ -182,81 +182,32 @@ class FcAppConfigModel extends BaseModel {
 
   /**
    * @method getCollectionDisplayData
-   * @description returns a formatted jsonld object for a collection
+   * @description returns a collection's display edit as plain json
    * 
    * @param {String} id collection id
    * @param {Object} opts options object with properties to save
-   * 
-   * @returns {Promise} resolves to record
+   *
+   * @returns {Object} plain json edit
    */
   getCollectionDisplayData(id, opts={}) {
     const {
-      title, 
-      watercolor, 
-      itemCount, 
-      itemDefaultDisplay, 
+      title,
+      watercolor,
+      itemCount,
+      itemDefaultDisplay,
       savedItems,
       showDisclaimer
     } = opts;
-    let data = {
-      "@context" : {
-        "@vocab" : "http://schema.org/",
-        "fedora" : "http://fedora.info/definitions/v4/repository#",
-        "ldp" : "www.w3.org/ns/ldp#",
-        "schema" : "http://schema.org/",
-        "ucdlib" : "http://digital.ucdavis.edu/schema#",
-        "xsd" : "http://www.w3.org/2001/XMLSchema#",
-        "collection" : {
-          "@type" : "@id",
-          "@id" : "ucdlib:collection"
-        },
-        "watercolors" : {
-          "@type" : "@id",
-          "@id" : "ucdlib:watercolors"
-        },
-        "foreground" : {
-          "@type" : "xsd:text",
-          "@id" : "ucdlib:foreground"
-        },
-        "background" : {
-          "@type" : "xsd:text",
-          "@id" : "ucdlib:background"
-        },
-        "ldp:membershipResource" : {
-          "@type" : "@id"
-        },
-        "ldp:hasMemberRelation" : {
-          "@type" : "@id"
-        }
-      },
-      "@id" : '',
-      "watercolors" : [
-        {
-          "@id" : `info:fedora/application/ucd-lib-client${id}#watercolor`,
-          "css" : watercolor,
-          "foreground" : "",
-          "background" : ""
-        }
-      ],
-      'schema:isPartOf': {'@id': `info:fedora${id}`},
-      "name" : title,
-      "ucdlib:itemCount" : itemCount,
-      "ucdlib:itemDefaultDisplay" : itemDefaultDisplay,
-      "ucdlib:showDisclaimer" : showDisclaimer,
-      "exampleOfWork" : savedItems,
-      "isPartOf" : {
-        "@id" : `info:fedora${id}`
-      }
+    // featured image is saved separately
+    return {
+      name : title,
+      watercolors : { css : watercolor },
+      itemCount,
+      itemDefaultDisplay,
+      showDisclaimer,
+      exampleOfWork : savedItems
     };
-
-    if( opts.newFileUploadName || opts.thumbnailUrlOverride ) {
-      data['thumbnailUrl'] = {
-        "@id" : `info:fedora/application/ucd-lib-client${id}/featuredImage.jpg`
-      };
-    }
-
-    return data;
-  }  
+  }
 
   /**
    * @method saveCollectionDisplayData
@@ -264,11 +215,12 @@ class FcAppConfigModel extends BaseModel {
    * 
    * @param {String} id collection id
    * @param {Array} displayData record id
-   * 
+   * @param {Object} opts {visibility: 'public'|'private'}, omit to keep current
+   *
    * @returns {Promise} resolves to record
    */
-  async saveCollectionDisplayData(id, displayData) {
-    return await this.service.saveCollectionDisplayData(id, displayData);
+  async saveCollectionDisplayData(id, displayData, opts={}) {
+    return await this.service.saveCollectionDisplayData(id, displayData, opts);
   }
 
   /**
@@ -276,8 +228,9 @@ class FcAppConfigModel extends BaseModel {
    * @description save collection featured image
    * 
    * @param {String} id collection id
-   * @param {Array} featuredImage record id
-   *  
+   * @param {File} featuredImage image file
+   *
+   * @returns {Promise<Object|null>} {error, response}, or null with no file
    */
   async saveCollectionFeaturedImage(id, featuredImage) {
     return await this.service.saveCollectionFeaturedImage(id, featuredImage);
@@ -307,54 +260,32 @@ class FcAppConfigModel extends BaseModel {
 
   /**
      * @method getItemDisplayData
-     * @description returns a formatted jsonld object for an item
+     * @description returns an item's display edit
      * 
      * @param {String} id record id
      * @param {String} itemDisplay display override
      * 
-     * @returns {Object} jsonld object
+     * @returns {Object} plain json edit
      */
   getItemDisplayData(id, itemDisplay) {
-    return {
-      "@context" : {
-        "@vocab" : "http://schema.org/",
-        "fedora" : "http://fedora.info/definitions/v4/repository#",
-        "ldp" : "www.w3.org/ns/ldp#",
-        "schema" : "http://schema.org/",
-        "ucdlib" : "http://digital.ucdavis.edu/schema#",
-        "xsd" : "http://www.w3.org/2001/XMLSchema#",
-        "item" : {
-          "@type" : "@id",
-          "@id" : "ucdlib:item"
-        },
-        "ldp:membershipResource" : {
-          "@type" : "@id"
-        },
-        "ldp:hasMemberRelation" : {
-          "@type" : "@id"
-        }
-      },
-      "@id" : '',
-      "ucdlib:itemDefaultDisplay" : itemDisplay,
-      "isPartOf" : {
-        "@id" : `info:fedora${id}`
-      }
-    }
+    return { itemDefaultDisplay : itemDisplay };
   }
 
   /**
-     * @method getItemDisplayData
-     * @description returns a formatted jsonld object for an item
-     * 
+     * @method updateItemDisplayExceptions
+     * @description clear the display override on each item, stopping at the first failure
+     *
      * @param {Array} itemExceptions array of record ids
-     * 
-     * @returns {Object} jsonld object
+     *
+     * @returns {Promise<Object|null>} the failed request's error result, or null
      */
   async updateItemDisplayExceptions(itemExceptions) {
     for( let itemId of itemExceptions ) {
       let newDisplayData = this.getItemDisplayData(itemId, '');
-      await this.service.saveItemDisplayData(itemId, newDisplayData);
+      let result = await this.service.saveItemDisplayData(itemId, newDisplayData);
+      if( result?.error ) return result;
     }
+    return null;
   }
 
   /**
