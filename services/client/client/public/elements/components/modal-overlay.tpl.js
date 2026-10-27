@@ -141,7 +141,7 @@ export default function render() {
     </style>
 
 
-    <div class="container">
+    <div class="container ${this.errorMode ? 'error-mode' : ''}">
       <div class="overlay">
         <div class="header-section">
           <h4>${this.title}</h4>

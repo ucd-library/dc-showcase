@@ -10,6 +10,7 @@ import "@ucd-lib/theme-elements/brand/ucd-theme-slim-select/ucd-theme-slim-selec
 import "../../components/cards/dams-item-card";
 import '../../components/citation';
 import '../../components/modal-overlay.js';
+import '../../components/saving-overlay.js';
 
 import user from '../../../lib/utils/user.js';
 import utils from '../../../lib/utils/index.js';
@@ -52,6 +53,8 @@ class AppCollection extends Mixin(LitElement)
       showModal : { type: Boolean },
       modalTitle : { type: String },
       modalContent : { type: String },
+      saving : { type: Boolean },
+      saveError : { type: Boolean },
     };
   }
 
@@ -237,6 +240,10 @@ class AppCollection extends Mixin(LitElement)
     this.showDisclaimer = false;
     this.visibility = 'private';
     this.savedVisibility = 'private';
+    this.saving = false;
+    this.saveError = false;
+    this.saveErrorTitle = 'Your changes weren\'t saved';
+    this.saveErrorContent = '<p>Something went wrong and your changes were not saved. Please try again. If the problem continues, contact library IT.</p>';
     this.showModal = false;
     this.modalTitle = 'Welcome to the new Digital Collections!';
     this.modalContent = `<p>We've recently updated this website, so some webpage addresses (URLs) may have changed. Please search within this collection for the item you're looking for.</p> <p>We apologize for the inconvenience.</p>`;
@@ -301,9 +308,7 @@ class AppCollection extends Mixin(LitElement)
    * @param {Object} e
    */
   async _onSaveClicked(e) {
-    if( !this.isUiAdmin ) return;
-
-    this.editMode = false;
+    if( !this.isUiAdmin || this.saving ) return;
 
     // parse highlighted items
     this.savedItems = [];
@@ -330,14 +335,6 @@ class AppCollection extends Mixin(LitElement)
     }
     this._updateDisplayData(featuredImage);
 
-
-    await this.FcAppConfigModel.saveCollectionDisplayData(this.collectionId, this.displayData, {visibility: this.visibility});
-    this.savedVisibility = this.visibility;
-    if( fileElement && featuredImage ) {
-      await this.FcAppConfigModel.saveCollectionFeaturedImage(this.collectionId, featuredImage);
-      fileElement.value = '';
-    }
-
     // parse checked item exceptions to reset them to collection default display type
     let itemExceptions = [];
     let checkboxes = this.querySelectorAll('.exceptions input[name="checkbox"]');
@@ -348,9 +345,18 @@ class AppCollection extends Mixin(LitElement)
       if( itemId ) itemExceptions.push(itemId);
     });
 
-    if( itemExceptions.length ) {
-      await this.FcAppConfigModel.updateItemDisplayExceptions(itemExceptions, this.itemDefaultDisplay);
+    this.saving = true;
+    let saved = await this._saveEdits(featuredImage, itemExceptions);
+    this.saving = false;
+    if( !saved ) {
+      // stay in edit mode to retry
+      this.saveError = true;
+      return;
     }
+
+    this.editMode = false;
+    this.savedVisibility = this.visibility;
+    if( fileElement ) fileElement.value = '';
 
     this.AppStateModel.setLocation(this.collectionId);
     // this._parseDisplayData();
@@ -364,6 +370,45 @@ class AppCollection extends Mixin(LitElement)
     }
  
     this.requestUpdate();
+  }
+
+  /**
+   * @method _saveEdits
+   * @description Save the collection edits, featured image and item display resets.
+   * Stops at the first failed request.
+   *
+   * @param {File|String} featuredImage new featured image, or '' for none
+   * @param {Array<String>} itemExceptions item ids to reset to the collection default
+   *
+   * @returns {Promise<Boolean>} true if everything saved
+   */
+  async _saveEdits(featuredImage, itemExceptions) {
+    try {
+      let result = await this.FcAppConfigModel.saveCollectionDisplayData(this.collectionId, this.displayData, {visibility: this.visibility});
+      if( result?.error ) return false;
+
+      if( featuredImage ) {
+        result = await this.FcAppConfigModel.saveCollectionFeaturedImage(this.collectionId, featuredImage);
+        if( result?.error ) return false;
+      }
+
+      if( itemExceptions.length ) {
+        result = await this.FcAppConfigModel.updateItemDisplayExceptions(itemExceptions, this.itemDefaultDisplay);
+        if( result?.error ) return false;
+      }
+    } catch(e) {
+      this.logger.warn('Error saving collection edits', e);
+      return false;
+    }
+    return true;
+  }
+
+  /**
+   * @method _onSaveErrorClose
+   * @description dismiss the save error modal
+   */
+  _onSaveErrorClose() {
+    this.saveError = false;
   }
 
   /**

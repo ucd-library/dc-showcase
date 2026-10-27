@@ -383,6 +383,14 @@ export default function render() {
 
     </style>
 
+    <app-modal-overlay
+      errorMode
+      ?hidden="${!this.saveError}"
+      .title="${this.saveErrorTitle}"
+      .content="${this.saveErrorContent}"
+      @ok=${this._onSaveErrorClose}>
+    </app-modal-overlay>
+    <app-saving-overlay ?active="${this.saving}"></app-saving-overlay>
     <div class="edit-overlay" ?hidden="${!this.editMode || !this.isUiAdmin}">
     </div>
     <div class="admin-edit" ?hidden="${!this.isUiAdmin}">

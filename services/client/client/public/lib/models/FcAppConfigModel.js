@@ -228,8 +228,9 @@ class FcAppConfigModel extends BaseModel {
    * @description save collection featured image
    * 
    * @param {String} id collection id
-   * @param {Array} featuredImage record id
-   *  
+   * @param {File} featuredImage image file
+   *
+   * @returns {Promise<Object|null>} {error, response}, or null with no file
    */
   async saveCollectionFeaturedImage(id, featuredImage) {
     return await this.service.saveCollectionFeaturedImage(id, featuredImage);
@@ -271,18 +272,20 @@ class FcAppConfigModel extends BaseModel {
   }
 
   /**
-     * @method getItemDisplayData
-     * @description returns a formatted jsonld object for an item
-     * 
+     * @method updateItemDisplayExceptions
+     * @description clear the display override on each item, stopping at the first failure
+     *
      * @param {Array} itemExceptions array of record ids
-     * 
-     * @returns {Object} jsonld object
+     *
+     * @returns {Promise<Object|null>} the failed request's error result, or null
      */
   async updateItemDisplayExceptions(itemExceptions) {
     for( let itemId of itemExceptions ) {
       let newDisplayData = this.getItemDisplayData(itemId, '');
-      await this.service.saveItemDisplayData(itemId, newDisplayData);
+      let result = await this.service.saveItemDisplayData(itemId, newDisplayData);
+      if( result?.error ) return result;
     }
+    return null;
   }
 
   /**

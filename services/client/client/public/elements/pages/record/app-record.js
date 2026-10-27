@@ -15,6 +15,8 @@ import "./app-media-download";
 import "./app-fs-media-download";
 import "./viewer/app-media-viewer";
 import "../../components/citation";
+import "../../components/modal-overlay.js";
+import "../../components/saving-overlay.js";
 
 import user from '../../../lib/utils/user.js';
 class AppRecord extends Mixin(LitElement)
@@ -43,6 +45,8 @@ class AppRecord extends Mixin(LitElement)
       arkDoi: { type: Array },
       isUiAdmin : { type : Boolean },
       editMode : { type : Boolean },
+      saving : { type : Boolean },
+      saveError : { type : Boolean },
       // citations : {type: Array}
       citationRoot: { type: Object },
       itemDefaultDisplay: { type: String }, // collection default display
@@ -118,6 +122,10 @@ class AppRecord extends Mixin(LitElement)
 
     this.isUiAdmin = user.canEditUi();
     this.editMode = false;
+    this.saving = false;
+    this.saveError = false;
+    this.saveErrorTitle = 'Your changes weren\'t saved';
+    this.saveErrorContent = '<p>Something went wrong and your changes were not saved. Please try again. If the problem continues, contact library IT.</p>';
     this.displayData = {};
     this.savedCollectionData = {};
     this.disableDownload = APP_CONFIG.disableFileDownloads;
@@ -570,16 +578,37 @@ class AppRecord extends Mixin(LitElement)
    * @param {Object} e 
    */
   async _onSaveClicked(e) {
-    if( !this.isUiAdmin ) return;
-    
+    if( !this.isUiAdmin || this.saving ) return;
+
     this.itemDisplay = document.querySelector('ucd-theme-slim-select.item-display-select')?.slimSelect?.selected();
     this._updateDisplayData();
-    await this.FcAppConfigModel.saveItemDisplayData(this.renderedRecordId, this.displayData);
+
+    this.saving = true;
+    let result;
+    try {
+      result = await this.FcAppConfigModel.saveItemDisplayData(this.renderedRecordId, this.displayData);
+    } catch(e) {
+      result = {error: true, details: e};
+    }
+    this.saving = false;
+    if( result?.error ) {
+      // stay in edit mode to retry
+      this.saveError = true;
+      return;
+    }
 
     this.editMode = false;
     // this.stopWorkflowLoop = true;
 
     this._changeMediaViewerDisplay('', true);
+  }
+
+  /**
+   * @method _onSaveErrorClose
+   * @description dismiss the save error modal
+   */
+  _onSaveErrorClose() {
+    this.saveError = false;
   }
 
   /**

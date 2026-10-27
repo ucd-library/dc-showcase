@@ -102,8 +102,13 @@ class FcAppConfigService extends BaseService {
         },
         body : featuredImage
       });
-      if( !resp.ok ) console.warn('Featured image upload failed', resp.status);
+      if( !resp.ok ) {
+        console.warn('Featured image upload failed', resp.status);
+        return {error: true, response: resp};
+      }
+      return {response: resp};
     }
+    return null;
   }
 
   getFeaturedCollectionAppData() {

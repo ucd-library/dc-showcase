@@ -35,12 +35,12 @@ export default function render() {
       padding: 0 40px;
     }
 
-    h2 {
+    app-collection h2 {
       font-weight: 700;
       color: var(--color-aggie-blue);
     }
 
-    h3 {
+    app-collection h3 {
       font-weight: 700;
     }
 
@@ -63,23 +63,23 @@ export default function render() {
       margin: 0.5rem 0;
     }
 
-    .collection-header h3 {
+    app-collection .collection-header h3 {
       margin: 0;
     }
 
-    a.btn--alt {
+    app-collection a.btn--alt {
       padding-top: 0;
       padding-bottom: 0;
       margin-top: 1rem;
       color: white;
     }
 
-    .image-overlay {
+    app-collection .image-overlay {
       position: relative;
       z-index: 450;
     }
 
-    .watercolor-bg {
+    app-collection .watercolor-bg {
       z-index: 1;
       position: absolute;
       top: 0;
@@ -89,7 +89,7 @@ export default function render() {
       margin: auto;
     }
 
-    .featured-image {
+    app-collection .featured-image {
       z-index: 50;
       top: 17%;
       left: 0;
@@ -106,7 +106,7 @@ export default function render() {
       padding-top: 52.5%;
     }
 
-    .watercolor-fg {
+    app-collection .watercolor-fg {
       z-index: 100;
       position: absolute;
       top: 0;
@@ -116,59 +116,59 @@ export default function render() {
       margin: auto;
     }
 
-    .content-warning {
+    app-collection .content-warning {
       padding: 2rem;
       margin-top: 2rem;
       background-color: var(--color-aggie-gold-30);
       font-style: italic;
     }
 
-    .disclaimer-admin-toggle {
+    app-collection .disclaimer-admin-toggle {
       margin-top: 2rem;
     }
 
-    .detail-section {
+    app-collection .detail-section {
       line-height: 1.7rem;
       width: 60%;
       margin: 0 auto;
     }
 
-    .description {
+    app-collection .description {
       margin: 0 0 2rem 0;
     }
 
-    .collection-label {
+    app-collection .collection-label {
       font-weight: bold;
       padding-right: 0.3rem;
     }
 
-    .collection-highlights {
+    app-collection .collection-highlights {
       text-align: center;
     }
 
-    .card-2,
-    .card-2-4 {
+    app-collection .card-2,
+    app-collection .card-2-4 {
       width: 75%;
       margin: 0 auto;
     }
-    .card-single,
-    .card-2,
-    .card-2-4,
-    .card-trio,
-    .card-5-plus {
+    app-collection .card-single,
+    app-collection .card-2,
+    app-collection .card-2-4,
+    app-collection .card-trio,
+    app-collection .card-5-plus {
       display: grid;
       grid-template-columns: auto;
       grid-gap: var(--spacing-sm);
     }
-    .card-single dams-collection-card,
-    .card-2 dams-collection-card,
-    .card-2-4 dams-collection-card,
-    .card-trio dams-collection-card,
-    .card-5-plus dams-collection-card {
+    app-collection .card-single dams-collection-card,
+    app-collection .card-2 dams-collection-card,
+    app-collection .card-2-4 dams-collection-card,
+    app-collection .card-trio dams-collection-card,
+    app-collection .card-5-plus dams-collection-card {
       margin-bottom: var(--spacing-default);
     }
 
-    .collection-highlights a.btn--primary {
+    app-collection .collection-highlights a.btn--primary {
       color: var(--color-aggie-blue);
       padding-top: .3rem;
       padding-bottom: .3rem;
@@ -178,21 +178,21 @@ export default function render() {
     }
 
     @media (min-width: 767px) {
-      .card-2,
-      .card-2-4 {
+      app-collection .card-2,
+      app-collection .card-2-4 {
         grid-template-columns: repeat(2, minmax(0, 1fr));
       }
-      .card-single,
-      .card-trio,
-      .card-5-plus {
+      app-collection .card-single,
+      app-collection .card-trio,
+      app-collection .card-5-plus {
         grid-template-columns: repeat(3, minmax(0, 1fr));
       }
-      .card-single .collection-item,
-      .card-single dams-item-card {
+      app-collection .card-single .collection-item,
+      app-collection .card-single dams-item-card {
         grid-column: 2;
       }
       
-      .card-trio {
+      app-collection .card-trio {
         margin-right: 0;
         margin-left: 0;
       }
@@ -210,31 +210,31 @@ export default function render() {
         margin: auto;
       }
       
-      .detail-section {
+      app-collection .detail-section {
         width: 80%;
       }
 
-      .citation {
+      app-collection .citation {
         display: block;
       }
 
-      .cite-graphic,
-      .cite-collection {
+      app-collection .cite-graphic,
+      app-collection .cite-collection {
         width: 80%;
         padding-top: 0;
       }
     }
 
-    .file-upload-container ucdlib-icon {
+    app-collection .file-upload-container ucdlib-icon {
       display: inline-block;
 
     }
     
-    input[type="file"] {
+    app-collection input[type="file"] {
         display: none;
     }
 
-    .file-upload-label {
+    app-collection .file-upload-label {
       cursor: pointer;
       background-color: var(--color-aggie-blue-80);
       color: white;
@@ -251,11 +251,11 @@ export default function render() {
       min-width: 150px;
     }
 
-    .left-panel {
+    app-collection .left-panel {
       display: flex;
     }
 
-    .left-panel .file-upload-label ucdlib-icon {
+    app-collection .left-panel .file-upload-label ucdlib-icon {
       height: 50%;
       width: 25px;
       position: relative;
@@ -264,30 +264,30 @@ export default function render() {
       fill: var(--color-aggie-gold);
     }
 
-    .left-panel .file-upload-label:hover {
+    app-collection .left-panel .file-upload-label:hover {
       background-color: var(--color-aggie-blue);
     }
 
-    .left-panel .file-upload-label span {
+    app-collection .left-panel .file-upload-label span {
       position: relative;
       top: 20%;
       right: 20%;
       padding-left: .2rem;
     }
 
-    .selected-file {
+    app-collection .selected-file {
       padding: 0 2rem 2rem;
       font-weight: bold;
     }
 
-    .admin-edit .left-panel {
+    app-collection .admin-edit .left-panel {
       position: absolute;
       left: 3rem;
       top: calc(170px + 3rem);
       z-index: 500;
     }
 
-    .admin-edit .right-panel {
+    app-collection .admin-edit .right-panel {
       position: absolute;
       right: 3rem;
       top: calc(170px + 3rem);
@@ -297,11 +297,11 @@ export default function render() {
       align-items: flex-end;
     }
 
-    .admin-edit .visibility-toggle {
+    app-collection .admin-edit .visibility-toggle {
       margin-top: .375rem;
     }
 
-    .admin-edit .visibility-toggle button {
+    app-collection .admin-edit .visibility-toggle button {
       border: none;
       padding: 0 1.5rem;
       font-family: inherit;
@@ -311,7 +311,7 @@ export default function render() {
       gap: .5rem;
     }
 
-    .admin-edit .visibility-toggle ucdlib-icon {
+    app-collection .admin-edit .visibility-toggle ucdlib-icon {
       width: 20px;
       height: 20px;
       margin: 0;
@@ -319,15 +319,19 @@ export default function render() {
       fill: var(--color-aggie-gold);
     }
 
-    .admin-edit .visibility-toggle button:hover {
+    app-collection .admin-edit .visibility-toggle span {
+      min-width: 50px;
+    }
+
+    app-collection .admin-edit .visibility-toggle button:hover {
       background-color: var(--color-aggie-blue);
     }
 
-    .admin-edit .visibility-toggle button:focus {
+    app-collection .admin-edit .visibility-toggle button:focus {
       color: white;
     }
 
-    .admin-edit .icon-wrapper {
+    app-collection .admin-edit .icon-wrapper {
       height: 50px;
       width: 50px;
       background-color: var(--color-aggie-blue-70);
@@ -337,7 +341,7 @@ export default function render() {
       cursor: pointer;
     }
 
-    .admin-edit ucdlib-icon {
+    app-collection .admin-edit ucdlib-icon {
       fill: white;
       width: 50%;
       height: 50%;
@@ -345,23 +349,23 @@ export default function render() {
       padding-top: 0.6rem;      
     }
 
-    .admin-edit .icon-wrapper.edit {
+    app-collection .admin-edit .icon-wrapper.edit {
       background-color: var(--color-aggie-blue);
     }
 
-    .admin-edit .icon-wrapper:hover {
+    app-collection .admin-edit .icon-wrapper:hover {
       background-color: var(--color-aggie-blue);
     }
 
-    .admin-edit .icon-wrapper.edit:hover {
+    app-collection .admin-edit .icon-wrapper.edit:hover {
       background-color: var(--color-aggie-gold);
     }
 
-    .admin-edit .icon-wrapper.edit:hover ucdlib-icon {
+    app-collection .admin-edit .icon-wrapper.edit:hover ucdlib-icon {
       fill: var(--color-aggie-blue);
     }
 
-    .edit-overlay {
+    app-collection .edit-overlay {
       background: white;
       position: fixed;
       top: 0;
@@ -372,7 +376,7 @@ export default function render() {
       z-index: 400;
     }
 
-    .color-pallette {
+    app-collection .color-pallette {
       display: flex;
       align-items: center;
       justify-content: center;
@@ -382,7 +386,7 @@ export default function render() {
       border-radius: 1.5rem;
     }
 
-    .color-circle {
+    app-collection .color-circle {
       width: 27px;
       height: 27px;
       border-radius: 50%;
@@ -393,24 +397,24 @@ export default function render() {
       -webkit-box-sizing: border-box;
     }
 
-    .color-circle:hover {
+    app-collection .color-circle:hover {
       border: 3px solid var(--color-aggie-blue-70);
     }
 
-    .color-circle[selected] {
+    app-collection .color-circle[selected] {
       border: 3px solid var(--color-aggie-blue);
     }
 
-    .edit-collections-container {
+    app-collection .edit-collections-container {
       z-index: 500;
       position: relative;
     }
 
-    .edit-collections-container .collection-item {
+    app-collection .edit-collections-container .collection-item {
       position: relative;
     }
 
-    .edit-collections-container .collection-item {
+    app-collection .edit-collections-container .collection-item {
       height: 135px;
       /* width: 401px; */
       background-color: var(--color-aggie-blue-30);
@@ -418,7 +422,7 @@ export default function render() {
       margin: 1rem;
     }
 
-    .edit-collections-container .collection-item span {
+    app-collection .edit-collections-container .collection-item span {
       display: block;
       text-align: start;
       padding: 1rem 1rem .5rem 1rem;
@@ -426,7 +430,7 @@ export default function render() {
       font-weight: bold;
     }
 
-    .edit-collections-container .collection-item input {
+    app-collection .edit-collections-container .collection-item input {
       position: absolute;
       left: 1rem;
       right: 1rem;
@@ -440,55 +444,55 @@ export default function render() {
       width: auto;
     }
 
-    .collection-highlights h2, 
-    .collection-highlights .header-dots {
+    app-collection .collection-highlights h2,
+    app-collection .collection-highlights .header-dots {
       position: relative;
       z-index: 500;
     }
 
-    .collection-highlights h2 {
+    app-collection .collection-highlights h2 {
       margin-bottom: 0;
       margin-top: 4rem;
     }
 
-    .edit-collections-container > fieldset {
+    app-collection .edit-collections-container > fieldset {
       border-top: none;
       padding-top: 0;
       margin-top: 0;
     }
 
-    .edit-collections-container > fieldset span {
+    app-collection .edit-collections-container > fieldset span {
       font-weight: bold;
     }
 
-    .list--reset {
+    app-collection .list--reset {
       margin: 0;
       padding: 0 0 0 1.25rem;
       padding-left: 0;
       list-style: none;
     }
 
-    .list--reset > li {
+    app-collection .list--reset > li {
       display: inline-block;
       padding-right: .5rem;
     }
 
-    .radio label {
+    app-collection .radio label {
       padding-top: .2rem;
     }
 
-    .radio label:before {
+    app-collection .radio label:before {
      top: 5px;
      left: -1px;
     }
     
-    .default-display {
+    app-collection .default-display {
       background-color: var(--color-aggie-gold-30);
       margin: 1rem;
       padding: 2rem;
     }
 
-    .default-display h3 {
+    app-collection .default-display h3 {
       font-style: italic;
       color: var(--color-aggie-blue);
       text-align: left;
@@ -497,20 +501,20 @@ export default function render() {
       margin-top: 0;
     }
 
-    .default-display span.label {
+    app-collection .default-display span.label {
       font-weight: bold;
     }
 
-    .default-item-display {
+    app-collection .default-item-display {
       text-align: left;
     }
 
-    .exceptions {
+    app-collection .exceptions {
       text-align: left;
       padding-left: 1rem;
     }
 
-    .default-item-display .default-item-display-fs {
+    app-collection .default-item-display .default-item-display-fs {
       border: none; 
       padding-left: 0; 
       padding-top: 0; 
@@ -522,24 +526,24 @@ export default function render() {
       top: -0.5rem;
     }    
 
-    .exceptions fieldset li,
-    .default-item-display fieldset li {
+    app-collection .exceptions fieldset li,
+    app-collection .default-item-display fieldset li {
       padding-top: .5rem;
     }
 
-    .exceptions fieldset label,
-    .default-item-display fieldset label {
+    app-collection .exceptions fieldset label,
+    app-collection .default-item-display fieldset label {
       display: inline-block;
     }
 
-    .exceptions fieldset label {
+    app-collection .exceptions fieldset label {
       font-weight: normal;
       color: inherit;
     }
 
 
 
-    .disclaimer-admin-toggle {
+    app-collection .disclaimer-admin-toggle {
       background-color: var(--color-aggie-gold-30);
       /* margin: 1rem; */
       padding: 2rem;
@@ -548,28 +552,28 @@ export default function render() {
       z-index: 500;
     }
 
-    .disclaimer-admin-toggle .disclaimer-header {
+    app-collection .disclaimer-admin-toggle .disclaimer-header {
       display: flex;
       justify-content: space-between;
       align-items: center;
     }
 
-    .disclaimer-admin-toggle .disclaimer-header span {
+    app-collection .disclaimer-admin-toggle .disclaimer-header span {
       font-weight: bold;
     }
 
-    .disclaimer-admin-toggle .disclaimer-content {
+    app-collection .disclaimer-admin-toggle .disclaimer-content {
       font-style: italic;
       line-height: 1.7rem;
     }
 
-    .toggle-switch {
+    app-collection .toggle-switch {
       display: flex;
       align-items: center;
       justify-content: center;
     }
 
-    .toggle-button {
+    app-collection .toggle-button {
       width: 35px;
       height: 13px;
       border-radius: 30px;
@@ -578,7 +582,7 @@ export default function render() {
       background-color: var(--color-black-20);
     }
 
-    .toggle-button::before {
+    app-collection .toggle-button::before {
       position: absolute;
       content: '';
       background-color: white;
@@ -590,18 +594,18 @@ export default function render() {
       box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
     }
 
-    .toggle-switch input:checked + .toggle-button {
+    app-collection .toggle-switch input:checked + .toggle-button {
       background-color: var(--color-aggie-blue-60);
     }
-    .toggle-switch input:checked + .toggle-button::before {
+    app-collection .toggle-switch input:checked + .toggle-button::before {
       transform: translateX(.8rem);
       background-color: var(--color-aggie-blue-80);
     }
-    .toggle-switch input {
+    app-collection .toggle-switch input {
       display: none;
     }
 
-    .highlight-display-select {
+    app-collection .highlight-display-select {
       display: inline-block;
       margin-left: 1rem;
       min-width: 3.5rem;
@@ -613,6 +617,14 @@ export default function render() {
       .content="${this.modalContent}"
       @ok=${this._onModalClose}>
     </app-modal-overlay>
+    <app-modal-overlay
+      errorMode
+      ?hidden="${!this.saveError}"
+      .title="${this.saveErrorTitle}"
+      .content="${this.saveErrorContent}"
+      @ok=${this._onSaveErrorClose}>
+    </app-modal-overlay>
+    <app-saving-overlay ?active="${this.saving}"></app-saving-overlay>
     <div class="edit-overlay" ?hidden="${!this.editMode || !this.isUiAdmin}">
     </div>
     <div class="admin-edit" ?hidden="${!this.isUiAdmin}">
@@ -649,8 +661,8 @@ export default function render() {
         </div>
         <div class="visibility-toggle" ?hidden="${!this.editMode || !this.isUiAdmin}">
           <button class="file-upload-label" @click="${this._onVisibilityToggle}">
-            <ucdlib-icon icon="ucdlib-dams:${this.visibility === 'public' ? 'fa-lock' : 'fa-unlock'}"></ucdlib-icon>
-            <span>Set ${this.visibility === 'public' ? 'Private' : 'Public'}</span>
+            <ucdlib-icon icon="ucdlib-dams:${this.visibility === 'public' ? 'fa-world' : 'fa-lock'}"></ucdlib-icon>
+            <span>${this.visibility === 'public' ? 'Public' : 'Private'}</span>
           </button>
         </div>
       </div>
