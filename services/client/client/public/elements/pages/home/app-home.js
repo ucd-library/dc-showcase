@@ -154,12 +154,14 @@ class AppHome extends Mixin(LitElement)
     this.heroImgOptions = (APP_CONFIG.featuredImages || []);
 
     // if collection doesn't exist for a featured image, remove it from the list
-    this.heroImgOptions = this.heroImgOptions.filter(i => {
-      return APP_CONFIG.collectionLabels[i.collectionLink];
-    });
+    // this.heroImgOptions = this.heroImgOptions.filter(i => {
+    //   return APP_CONFIG.collectionLabels[i.collectionLink];
+    // });
 
     let i = Math.floor(Math.random() *  this.heroImgOptions.length);
     let src = this.heroImgOptions[i];
+
+    if (!src) return;
 
     this.heroUrl = src.imageUrl;
     this.heroItemLabel = src.itemName;
