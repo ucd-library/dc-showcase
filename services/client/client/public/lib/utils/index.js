@@ -217,6 +217,7 @@ class Utils {
     let thumbnailUrl = "";
     let graph = clientMedia.graph;
 
+
     if( !clientMedia.mediaGroups ) return thumbnailUrl;
 
     // for audio/video, if root node has image, use that
@@ -240,10 +241,11 @@ class Utils {
         thumbnailUrl = firstImage?.clientMedia?.images?.medium?.url;
       } else if (mediaType === "VideoObject" || mediaType === 'AudioObject') {
         isAudioVideo = true;
-        // pull image from root node if exists
+        // pull image from root node if properly linked
         let rootNode = graph.filter((g) => g["@id"] === clientMedia["id"])[0];
-        if (rootNode) {
-          rootImage = rootNode.image?.["@id"];
+        if (rootNode?.image?.["@id"]) {
+          let imageNode = (graph || []).find((g) => g["@id"] === rootNode.image["@id"]);
+          rootImage = imageNode?.clientMedia?.images?.medium?.url || "/images/tree-bike-illustration.png";
         }
       }
     }

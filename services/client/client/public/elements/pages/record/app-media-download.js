@@ -138,14 +138,20 @@ export default class AppMediaDownload extends Mixin(LitElement).with(
       let download = this.downloadOptions[0];
       let downloadUrl = download.clientMedia?.download?.[0]?.url || download['@id'] || '';
       let formatLabel = (downloadUrl.split('.').pop() || formatLabel).toUpperCase();
-      this.shadowRoot.querySelector("#multimedia-format-label").innerHTML = formatLabel + ' (' + bytes(download.fileSize).toLowerCase() + ')';
+      if( download.fileSize ) {
+        formatLabel += ' (' + bytes(download.fileSize).toLowerCase() + ')';
+      }
+      this.shadowRoot.querySelector("#multimedia-format-label").innerHTML = formatLabel;
       this.showImageFormats = false;
 
       // update all label to include video + other media (prob just thumbnail)
       // multimedia-all-format-label
       let filesize = this.sources.reduce((a, r) => a + r.fileSize, 0);
       // let fileTypes = this.sources.map(s => s.url?.split('.')?.pop()).join(', ');
-      let label = formatLabel + ' (' + bytes(filesize).toLowerCase() + ')';
+      let label = formatLabel;
+      if ( filesize ) {
+        label += ' (' + bytes(filesize).toLowerCase() + ')';
+      }
       this.shadowRoot.querySelector("#multimedia-all-format-label").innerHTML = label;
 
     } else {
