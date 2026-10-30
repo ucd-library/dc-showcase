@@ -3,13 +3,10 @@ const path = require('path');
 const fs = require('fs');
 const spaMiddleware = require('@ucd-lib/spa-router-middleware');
 const config = require('../config');
-const appConfig = require('../lib/fcrepo-app-config');
 
 const models = require('./models.js');
 const { logger } = require('../lib/logger');
 const crypto = require('crypto');
-
-appConfig.reload(true);
 
 let jsBundleHash = '';
 let corkBuildInfo = null;
@@ -25,6 +22,9 @@ module.exports = async (app) => {
 
   let recordModel = await models.get('item');
   recordModel = recordModel?.model;
+
+  let appConfigModel = await models.get('app-config');
+  appConfigModel = appConfigModel?.model;
 
   /**
    * Setup SPA app routes
@@ -50,7 +50,7 @@ module.exports = async (app) => {
         user : user,
         appRoutes : config.client.appRoutes,
         // recordCount: (await records.rootCount()).count,
-        featuredImages : config.client.featuredImages,
+        featuredImages : await appConfigModel.getHeroImages(),
         itemTextFields : config.client.itemTextFields,
         collectionTextFields : config.client.collectionTextFields,
         useDateRangeFields : config.client.useDateRangeFields,
@@ -58,7 +58,6 @@ module.exports = async (app) => {
         disableFileDownloads : config.gateway.proxy.disableFileDownloads,
         downloadMirrorUrl : config.fcrepo.dataMirror.url,
         buildInfo : loadCorkBuildInfo(),
-        fcAppConfig : appConfig.config,
         title : config.client.title,
         logger : config.client.logger,
         enableGA4Stats : config.client.enableGA4Stats,

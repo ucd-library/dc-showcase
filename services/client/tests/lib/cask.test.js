@@ -68,6 +68,25 @@ describe('lib/cask.js', () => {
     assert.equal(cask.casRelativePath('abcdef0123456789'), '/cas/abc/def/abcdef0123456789');
   });
 
+  it('read() returns a file\'s text', async () => {
+    let calledUrl;
+    global.fetch = async (url) => {
+      calledUrl = url;
+      return new Response('[1]');
+    };
+
+    assert.equal(await cask.read('/gold/digital-dev/featured-collection-edits.json'), '[1]');
+    assert.equal(calledUrl, cask.fileUrl('/gold/digital-dev/featured-collection-edits.json'));
+  });
+
+  it('read() returns null for a missing file and throws on other errors', async () => {
+    global.fetch = async () => new Response('nope', { status: 404 });
+    assert.equal(await cask.read('/x.json'), null);
+
+    global.fetch = async () => new Response('boom', { status: 500 });
+    await assert.rejects(() => cask.read('/x.json'));
+  });
+
   it('fileUrl() builds the content-stream URL for a file path', () => {
     assert.equal(
       cask.fileUrl('/gold/digital-dev/item-a/item.jsonld.json'),

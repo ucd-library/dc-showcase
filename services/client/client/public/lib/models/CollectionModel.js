@@ -81,18 +81,6 @@ class CollectionModel extends BaseModel {
     }
 
     /**
-     * @method getAdminData
-     * @description load a records admin data by id
-     * 
-     * @param {String} id record id
-     * 
-     * @returns {Promise} resolves to record
-     */
-    async getAdminData(id) {
-      return await this.service.getAdminData(id);
-    }
-
-    /**
      * @method getSelectedCollection
      * @description get the selected collection
      */

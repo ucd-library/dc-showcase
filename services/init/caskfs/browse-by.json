@@ -1,0 +1,98 @@
+{
+  "subjectPage": [
+    {
+      "page": 1,
+      "leftImage": "browse-by/watercolor-lug-D211_5_38-left-white.png",
+      "leftLabel": "Corona Beauty",
+      "leftItemLink": "/item/ark:/87293/d3qz22k6q",
+      "rightImage": "browse-by/watercolor-lehmann-d76p4c-right-white.png",
+      "rightLabel": "Season's Greetings 1978",
+      "rightItemLink": "/item/ark:/87287/d76p4c"
+    },
+    {
+      "page": 2,
+      "leftImage": "browse-by/watercolor-BioAg-AR_012_1467f-left-white.png",
+      "leftLabel": "Plow",
+      "leftItemLink": "/item/ark:/87293/d3v97zw44",
+      "rightImage": "browse-by/watercolor-eastman-B-480-right-white.png",
+      "rightLabel": "Kettle Rock Lookout Station",
+      "rightItemLink": "/item/ark:/13030/tf1580023m"
+    },
+    {
+      "page": 3,
+      "leftImage": "browse-by/watercolor-eastman-B-1614-left-white.png",
+      "leftLabel": "Up and Over",
+      "leftItemLink": "/item/ark:/13030/tf2h4nb037",
+      "rightImage": "browse-by/watercolor-eastman-B-1614-right-white.png",
+      "rightLabel": "Up and Over",
+      "rightItemLink": "/item/ark:/13030/tf2h4nb037"
+    },
+    {
+      "page": 4,
+      "leftImage": "browse-by/watercolor-CalAg-d3j34z-left-white.png",
+      "leftLabel": "Preparing to Launch",
+      "leftItemLink": "/item/ark:/87293/d3j34z",
+      "rightImage": "browse-by/watercolor-slater-d33q10-235-right-white.png",
+      "rightLabel": "VIII Olympiade, Paris",
+      "rightItemLink": "/item/ark:/87293/d33q10"
+    }
+  ],
+  "creatorPage": [
+    {
+      "page": 1,
+      "leftImage": "browse-by/watercolor-everest-d3d02x-left-white.png",
+      "leftLabel": "Hari Singh Everest",
+      "leftItemLink": "/item/ark:/87293/d3d02x",
+      "rightImage": "browse-by/watercolor-robinson_jancis-87293_d3d80x-right-white.png",
+      "rightLabel": "Jancis Robinson",
+      "rightItemLink": "/item/ark:/87293/d3d80x"
+    },
+    {
+      "page": 2,
+      "leftImage": "browse-by/watercolor-wait-frona-87293_d3dr2pc8k-left-white.png",
+      "leftLabel": "Frona Eunice Wait",
+      "leftItemLink": "/item/ark:/87293/d3dr2pc8k",
+      "rightImage": "browse-by/watercolor-eastman-P-2214-right-white.png",
+      "rightLabel": "Jervie Henry Eastman",
+      "rightItemLink": "/item/ark:/13030/tf4199n8nz"
+    },
+    {
+      "page": 3,
+      "leftImage": "browse-by/watercolor-greene-D192_6_141-left-white.png",
+      "leftLabel": "Henry Dart Greene",
+      "leftItemLink": "/item/ark:/87293/d3s19b",
+      "rightImage": "browse-by/watercolor-greene-ruth-D192_7_108-right-white.png",
+      "rightLabel": "Ruth Greene",
+      "rightItemLink": "/item/ark:/87293/d3bz1k"
+    },
+    {
+      "page": 4,
+      "leftImage": "browse-by/watercolor-campbell-mc022_2_40-left-white.png",
+      "leftLabel": "Robert N. Campbell",
+      "leftItemLink": "/item/ark:/87293/d30r1d",
+      "rightImage": "browse-by/watercolor-slater-d3m082-355-white.png",
+      "rightLabel": "Colby E \"Babe\" Slater",
+      "rightItemLink": "/item/ark:/87293/d3m082"
+    }
+  ],
+  "formatPage": [
+    {
+      "page": 1,
+      "leftImage": "browse-by/watercolor-027-Willow_Slough-left-white.png",
+      "leftLabel": "We Got 'Im",
+      "leftItemLink": "/item/ark:/87293/d3xq83",
+      "rightImage": "browse-by/watercolor-d3031v-1962-right-white.png",
+      "rightLabel": "Letters to the Editor",
+      "rightItemLink": "/item/ark:/87293/d3031v"
+    },
+    {
+      "page": 2,
+      "leftImage": "browse-by/watercolor-d3b979-036-left-white.png",
+      "leftLabel": "World War I Diary",
+      "leftItemLink": "/item/ark:/87293/d3b979",
+      "rightImage": "browse-by/watercolor-d3dt26-221-right-white.png",
+      "rightLabel": "Correspondence",
+      "rightItemLink": "/item/ark:/87293/d3dt26"
+    }
+  ]
+}

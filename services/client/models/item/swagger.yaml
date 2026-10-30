@@ -2,6 +2,37 @@ tags:
   - name: item
     description: Item Information
 paths:
+  /api/item/archive:
+    get:
+      tags:
+        - item
+      summary: Download item files as a zip
+      description: Streams the given CaskFS download urls as one uncompressed zip
+      parameters:
+        - name: paths
+          in: query
+          description: Comma-separated /cask/api/fs/ download urls
+          required: true
+          schema:
+            type: string
+        - name: name
+          in: query
+          description: Zip file name, without extension
+          required: false
+          schema:
+            type: string
+      responses:
+        '200':
+          description: zip archive
+          content:
+            application/zip:
+              schema:
+                type: string
+                format: binary
+        '400':
+          description: missing or non-CaskFS paths
+        '404':
+          description: a requested file was not found
   /api/item/{itemId}:
     get:
       tags:
