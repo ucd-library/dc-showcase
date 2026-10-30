@@ -76,9 +76,9 @@ export default class AppBrowseBy extends Mixin(LitElement)
       ];
     }
     
-    let browseByImages = await this.FcAppConfigModel.getDefaultImagesConfig();
-    if( browseByImages ) {
-      browseByImages = browseByImages.body.browseByImages;
+    let browseByImages = await this.FcAppConfigModel.getBrowseBySideImages();
+    if( browseByImages?.body ) {
+      browseByImages = browseByImages.body;
       switch (this.label.toLowerCase()) {
         case 'subject':
           this.sideImages = browseByImages.subjectPage;

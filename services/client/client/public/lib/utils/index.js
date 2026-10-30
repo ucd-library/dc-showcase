@@ -399,48 +399,6 @@ class Utils {
   }
 
   /**
-   * @method getAppConfigCollectionGraph
-   * @description given an id, get app_config collection graph if exists, or hit the API
-   * 
-   * @param {String} id
-   * @param {Object} fcAppConfigModel reference to model
-   */
-  async getAppConfigCollectionGraph(id, fcAppConfigModel) {
-    // let savedData = APP_CONFIG.fcAppConfig[`/application/ucd-lib-client${id.replace('/collection', '')}.jsonld.json`];
-    // if( savedData ) return savedData;
-    let savedData;
-    try {
-      savedData = await fcAppConfigModel.getCollectionAppData(id);  
-    } catch( error ) {
-      console.warn('Error getting app config collection graph for ' + id, error);
-    }
-    if( savedData && savedData.body ) return JSON.parse(savedData.body);
-    
-    return null;
-  }
-
-  /**
-   * @method getAppConfigItemGraph
-   * @description given an id, get app_config collection graph if exists, or hit the API
-   * 
-   * @param {String} id
-   * @param {Object} fcAppConfigModel reference to model
-   */
-  async getAppConfigItemGraph(id, fcAppConfigModel) {
-    // let savedData = APP_CONFIG.fcAppConfig[`/application/ucd-lib-client${id.replace('/item', '')}.jsonld.json`];
-    // if( savedData ) return savedData;
-    let savedData;
-    try {
-      savedData = await fcAppConfigModel.getItemAppData(id);  
-    } catch( error ) {
-      console.warn('Error getting app config item graph for ' + id, error);
-    }
-    if( savedData && savedData.body ) return JSON.parse(savedData.body);
-    
-    return null;     
-  }  
-
-  /**
    * @method getSubjectUrl
    * @description given a subject string, build search url 
    * 

@@ -113,7 +113,7 @@ class AppHome extends Mixin(LitElement)
         }
       }
   
-      // filter out collections that don't exist in fcrepo
+      // filter out collections that don't exist
       let cardsPanels = this.displayData.filter(d => d.type === 'cards');
       cardsPanels.forEach(async panel => {
         let collectionIds = [];
@@ -214,7 +214,7 @@ class AppHome extends Mixin(LitElement)
   async _onSaveClicked(e) {
     if( !this.isUiAdmin ) return;
     this.editMode = false;
-    // save to fcrepo container
+    // save to caskfs featured-collection-edits.json
     //   also how to handle validation that all 6 featured items are populated? or more like how to alert user
     let adminPanel = document.querySelector('admin-featured-collections');
     if( adminPanel ) {

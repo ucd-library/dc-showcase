@@ -2,16 +2,26 @@ const pg = require('../../lib/pg.js');
 const esClient = require('../../lib/es-client.js');
 const config = require('../../config.js');
 const uriUtils = require('../../lib/uri-utils.js');
+const cask = require('../../lib/cask.js');
+const { logger } = require('../../lib/logger.js');
 
 const VISIBILITY = ['public', 'private'];
+
+// gold json cache lifetime
+const JSON_CACHE_MS = 5 * 60 * 1000;
 
 /**
  * @class AppConfigModel
  * @description Collection and item display edits (watercolor, featured image,
- * viewer overrides, visibility), stored as plain JSON in the dcf_edits tables.
- * Ids are stored as full record URIs; site paths are accepted and returned.
+ * viewer overrides, visibility) in the dcf_edits tables, keyed by full record URIs.
+ * Site-wide config (featured collections, hero banner, browse by images) lives
+ * as json files in the gold project's CaskFS folder.
  */
 class AppConfigModel {
+
+  constructor() {
+    this.jsonCache = {};
+  }
 
   /**
    * @method get
@@ -164,6 +174,124 @@ class AppConfigModel {
       throw this._badRequest('collection has no goldPath, reindex it: '+id);
     }
     return root.goldPath + '/featured-image' + ext;
+  }
+
+  /**
+   * @method goldPath
+   * @description The CaskFS path of a file in the app's gold project folder.
+   *
+   * @param {String} file e.g. featured-collection-edits.json
+   *
+   * @returns {String} e.g. /gold/digital-dev/featured-collection-edits.json
+   */
+  goldPath(file) {
+    return config.cask.goldBasePath + '/' + file;
+  }
+
+  /**
+   * @method getFeaturedEdits
+   * @description Get the home page's featured collections panels.
+   *
+   * @returns {Promise<Array>} saved panels, or [] if none have been saved
+   */
+  async getFeaturedEdits() {
+    let text = await cask.read(this.goldPath('featured-collection-edits.json'));
+    return text ? JSON.parse(text) : [];
+  }
+
+  /**
+   * @method saveFeaturedEdits
+   * @description Replace the home page's featured collections panels.
+   *
+   * @param {Array} panels panel objects from the home page editor
+   * @param {Object} opts currently unused
+   *
+   * @returns {Promise<Array>} the saved panels
+   */
+  async saveFeaturedEdits(panels, opts={}) {
+    if( !Array.isArray(panels) || panels.some(p => typeof p !== 'object' || p === null || Array.isArray(p)) ) {
+      throw this._badRequest('featured collections must be an array of objects');
+    }
+    await cask.write(
+      this.goldPath('featured-collection-edits.json'),
+      JSON.stringify(panels, null, 2),
+      {mimeType: 'application/json'}
+    );
+    return panels;
+  }
+
+  /**
+   * @method getHeroImages
+   * @description Get the home page hero images from hero-banner.json, with servable image urls.
+   *
+   * @returns {Promise<Array>} [{imageUrl, itemName, collectionName, itemLink, collectionLink}]
+   */
+  async getHeroImages() {
+    let hero = await this._readCachedJson('hero-banner.json', []);
+    return hero.map(({image, ...rest}) => ({
+      imageUrl : this._imageUrl(image),
+      ...rest
+    }));
+  }
+
+  /**
+   * @method getBrowseBySideImages
+   * @description Get the browse by pages' side images from browse-by.json, with servable image urls.
+   *
+   * @returns {Promise<Object>} {subjectPage, creatorPage, formatPage}, each a list of
+   * {page, leftImgUrl, leftLabel, leftItemLink, rightImgUrl, rightLabel, rightItemLink}
+   */
+  async getBrowseBySideImages() {
+    let pages = await this._readCachedJson('browse-by.json', {});
+    let result = {};
+    for( let [page, entries] of Object.entries(pages) ) {
+      result[page] = entries.map(({leftImage, rightImage, ...rest}) => {
+        let entry = {...rest};
+        if( leftImage ) entry.leftImgUrl = this._imageUrl(leftImage);
+        if( rightImage ) entry.rightImgUrl = this._imageUrl(rightImage);
+        return entry;
+      });
+    }
+    return result;
+  }
+
+  /**
+   * @method _imageUrl
+   * @description Servable url for a file in the gold project folder.
+   *
+   * @param {String} file e.g. browse-by/a.png
+   *
+   * @returns {String}
+   */
+  _imageUrl(file) {
+    return '/cask/api/fs' + this.goldPath(file);
+  }
+
+  /**
+   * @method _readCachedJson
+   * @description Read a gold project json file, cached for a few minutes since page loads read it.
+   * A missing or unreadable file returns the fallback.
+   *
+   * @param {String} file path in the gold project folder
+   * @param {*} fallback value when the file can't be read
+   *
+   * @returns {Promise<*>}
+   */
+  async _readCachedJson(file, fallback) {
+    let cached = this.jsonCache[file];
+    if( cached && cached.expires > Date.now() ) return cached.value;
+
+    let value = fallback;
+    try {
+      let text = await cask.read(this.goldPath(file));
+      if( text ) value = JSON.parse(text);
+      else logger.warn(`No ${file} in CaskFS gold project, run digtk showcase init-cask`);
+    } catch(e) {
+      logger.error(`Error reading ${file}`, e);
+    }
+
+    this.jsonCache[file] = {value, expires: Date.now() + JSON_CACHE_MS};
+    return value;
   }
 
   /**

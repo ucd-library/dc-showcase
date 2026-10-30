@@ -143,6 +143,24 @@ class CaskClient {
   }
 
   /**
+   * @method read
+   * @description Read a CaskFS file's content as text (`GET /api/fs/{path}`).
+   *
+   * @param {String} filePath CaskFS-absolute path
+   * @param {Object} opts currently unused
+   *
+   * @returns {Promise<String|null>} file content, or null if it doesn't exist
+   */
+  async read(filePath, opts={}) {
+    let resp = await fetch(this.fileUrl(filePath), { headers: this.headers() });
+    if( resp.status === 404 ) return null;
+    if( !resp.ok ) {
+      throw new Error(`CaskFS read failed (${resp.status}): ${await resp.text()}`);
+    }
+    return resp.text();
+  }
+
+  /**
    * @method write
    * @description Create or replace a CaskFS file (`PUT /api/fs/{path}`).
    * The body can be a stream, such as an incoming request.

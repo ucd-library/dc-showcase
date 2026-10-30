@@ -95,6 +95,30 @@ router.put(/^\/item\/.+/, protect, async (req, res) => {
   }
 });
 
+router.get('/featured-collections', async (req, res) => {
+  try {
+    res.json(await model.getFeaturedEdits());
+  } catch(e) {
+    sendError(res, e);
+  }
+});
+
+router.get('/browse-by/side-images', async (req, res) => {
+  try {
+    res.json(await model.getBrowseBySideImages());
+  } catch(e) {
+    sendError(res, e);
+  }
+});
+
+router.put('/featured-collections', protect, async (req, res) => {
+  try {
+    res.json(await model.saveFeaturedEdits(req.body, {user: editor(req)}));
+  } catch(e) {
+    sendError(res, e);
+  }
+});
+
 router.post(/^\/collection\/.+\/featured-image$/, protect, async (req, res) => {
   try {
     let mimeType = (req.headers['content-type'] || '').split(';')[0].trim();
