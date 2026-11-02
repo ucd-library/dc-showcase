@@ -137,18 +137,18 @@ export default class AppMediaDownload extends Mixin(LitElement).with(
       this.fullSetSelected = false;
       let download = this.downloadOptions[0];
       let downloadUrl = download.clientMedia?.download?.[0]?.url || download['@id'] || '';
-      let formatLabel = (downloadUrl.split('.').pop() || formatLabel).toUpperCase();
+      let format = (downloadUrl.split('.').pop() || '').toUpperCase();
+      let formatLabel = format;
       if( download.fileSize ) {
         formatLabel += ' (' + bytes(download.fileSize).toLowerCase() + ')';
       }
       this.shadowRoot.querySelector("#multimedia-format-label").innerHTML = formatLabel;
       this.showImageFormats = false;
 
-      // update all label to include video + other media (prob just thumbnail)
-      // multimedia-all-format-label
-      let filesize = this.sources.reduce((a, r) => a + r.fileSize, 0);
-      // let fileTypes = this.sources.map(s => s.url?.split('.')?.pop()).join(', ');
-      let label = formatLabel;
+      // all files label: every format, total size
+      let filesize = this.sources.reduce((a, r) => a + (r.fileSize || 0), 0);
+      let fileTypes = [...new Set(this.sources.map(s => (s.label || s.url?.split('.')?.pop() || '').toUpperCase()))];
+      let label = fileTypes.filter(Boolean).join(', ') || format;
       if ( filesize ) {
         label += ' (' + bytes(filesize).toLowerCase() + ')';
       }
@@ -298,7 +298,7 @@ export default class AppMediaDownload extends Mixin(LitElement).with(
     this.zipName = this.rootRecord.name
       .replace(/[^a-zA-Z0-9]/g, "-")
       .toLowerCase();
-    this.archiveHref = '/fin/archive?paths=' + this.sources.map(s => s.url).join(',') + (this.zipName ? '&name='+this.zipName : '');
+    this.archiveHref = '/api/item/archive?paths=' + this.sources.map(s => s.url).join(',') + (this.zipName ? '&name='+this.zipName : '');
 
     this.downloadAllMedia = true;
     let formats = [];
@@ -352,7 +352,7 @@ export default class AppMediaDownload extends Mixin(LitElement).with(
       this.zipName = this.rootRecord.name
         .replace(/[^a-zA-Z0-9]/g, "-")
         .toLowerCase();
-      this.archiveHref = '/fin/archive?paths=' + sources.map(s => s.url).join(',') + (this.zipName ? '&name='+this.zipName : '');
+      this.archiveHref = '/api/item/archive?paths=' + sources.map(s => s.url).join(',') + (this.zipName ? '&name='+this.zipName : '');
     } else if( this.AppStateModel.location.fullpath === this.rootRecord['@id'] ) {
       // first image from imageList if exists, or mediaObject first download
       this.href = imageList?.clientMedia?.download?.[0]?.url || firstMediaDownload;
@@ -575,7 +575,7 @@ export default class AppMediaDownload extends Mixin(LitElement).with(
     this.zipPaths = urls;
 
     // this.shadowRoot.querySelector("#format") to get current format, match to url label?
-    this.archiveHref = `/fin/archive?paths=${this.zipConcatenatedPaths}${this.zipName ? '&name='+this.zipName : ''}`;
+    this.archiveHref = `/api/item/archive?paths=${this.zipConcatenatedPaths}${this.zipName ? '&name='+this.zipName : ''}`;
   }
 
   /**

@@ -278,7 +278,7 @@ export default function render() {
     </div>
 
     <!-- <form id="downloadZip"
-      action="/fin/archive" 
+      action="/api/item/archive" 
       method="get" 
       ?hidden="${!this.fullSetSelected}">    
       <input type="text" hidden name="name" value="${this.zipName}" style="display: none;">
