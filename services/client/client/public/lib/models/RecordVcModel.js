@@ -102,7 +102,9 @@ class RecordVcModel {
         collectionName: config.collectionLabels[collectionId] || '',
         clientMedia: clientMedia,
         images,
-        date: root.datePublished || root.yearPublished || 'Undated',
+        // dateDisplay is precomputed at index time (circa/uncertain wording, decade/century
+        // phrasing, etc) - only fall back to ad hoc formatting for records that predate it
+        date: root.dateDisplay || utils.formatDateString(root.datePublished) || root.yearPublished || 'Undated',
         description: root.description || '',
         publisher: root?.publisher?.name,
         subjects,

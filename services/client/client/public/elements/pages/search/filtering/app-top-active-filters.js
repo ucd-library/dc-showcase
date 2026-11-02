@@ -49,11 +49,11 @@ export default class AppTopActiveFilters extends Mixin(LitElement)
             label :  this._getLabel(key, value)
           });
         });
-      } else if( filter.type === 'range' ) {
+      } else if( filter.type === 'range' || filter.type === 'range-overlap' ) {
         let value = this.currentFilters[key].value;
         active.push({
           bucket : key,
-          type : 'range',
+          type : filter.type,
           value : value,
           label :  'Published: '+value.gte+' to '+value.lte
         });
@@ -88,7 +88,7 @@ export default class AppTopActiveFilters extends Mixin(LitElement)
     this.RecordModel.setPaging(searchDoc, 0);
     if( item.type === 'keyword') {
       this.RecordModel.removeKeywordFilter(searchDoc, item.bucket, item.value);
-    } else if( item.type === 'range' ) {
+    } else if( item.type === 'range' || item.type === 'range-overlap' ) {
       this.RecordModel.removeRangeFilter(searchDoc, item.bucket);
     }
     this.RecordModel.setSearchLocation(searchDoc);

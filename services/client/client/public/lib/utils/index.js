@@ -11,6 +11,64 @@ class Utils {
     brTwoPage: "Book Reader - 2 Page",
   };
 
+  // keep in sync with the @media(max-width:768px) breakpoint used in these
+  // same components' CSS, so JS and CSS never disagree about "mobile"
+  mobileBreakpoint = 768;
+
+  /**
+   * @method watchMobileViewport
+   * @description watch for the viewport crossing the mobile breakpoint, invoking
+   * onChange immediately with the current state and again on every crossing
+   *
+   * @param {Function} onChange called with a Boolean (true if viewport is at or
+   * below the mobile breakpoint)
+   *
+   * @returns {Function} unsubscribe function - call to stop watching
+   */
+  watchMobileViewport(onChange) {
+    const mql = window.matchMedia(`(max-width: ${this.mobileBreakpoint}px)`);
+    const listener = () => onChange(mql.matches);
+    mql.addEventListener('change', listener);
+    onChange(mql.matches);
+    return () => mql.removeEventListener('change', listener);
+  }
+
+  // scroll position recorded at lock time, restored on unlock
+  _lockedScrollY = 0;
+
+  /**
+   * @method lockBodyScroll
+   * @description lock or unlock page scroll - used when a component enters a
+   * fixed-position fullscreen mode (eg the bookreader fullscreen view, or the
+   * mobile transcript sheet) so the page underneath can't scroll behind it.
+   * Pins <body> with position:fixed at the current scroll offset rather than
+   * just setting overflow:hidden - Safari on iOS doesn't reliably honor
+   * overflow:hidden on <body> to block touch-driven scrolling, so that alone
+   * still lets the page scroll behind a "locked" fullscreen view there.
+   *
+   * @param {Boolean} locked
+   */
+  lockBodyScroll(locked) {
+    if( locked ) {
+      this._lockedScrollY = window.scrollY;
+      document.documentElement.style.overflow = 'hidden';
+      document.body.style.position = 'fixed';
+      document.body.style.top = `-${this._lockedScrollY}px`;
+      document.body.style.left = '0';
+      document.body.style.right = '0';
+      document.body.style.width = '100%';
+    } else {
+      document.documentElement.style.overflow = '';
+      document.body.style.position = '';
+      document.body.style.top = '';
+      document.body.style.left = '';
+      document.body.style.right = '';
+      document.body.style.width = '';
+      window.scrollTo(0, this._lockedScrollY);
+      this._lockedScrollY = 0;
+    }
+  }
+
   getYearFromDate(date) {
     if (!date) return "";
     date = date + "";
@@ -67,6 +125,31 @@ class Utils {
   }
 
   /**
+   * @method formatTime
+   * @description format a duration in seconds as a mm:ss (or h:mm:ss for durations
+   * over an hour) timestamp, for labeling transcript/caption cues
+   *
+   * @param {Number} seconds
+   *
+   * @returns {String}
+   */
+  formatTime(seconds) {
+    if (typeof seconds !== 'number' || isNaN(seconds) || seconds < 0) return '0:00';
+
+    const totalSeconds = Math.floor(seconds);
+    const h = Math.floor(totalSeconds / 3600);
+    const m = Math.floor((totalSeconds % 3600) / 60);
+    const s = totalSeconds % 60;
+    const paddedS = String(s).padStart(2, '0');
+
+    if (h > 0) {
+      const paddedM = String(m).padStart(2, '0');
+      return `${h}:${paddedM}:${paddedS}`;
+    }
+    return `${m}:${paddedS}`;
+  }
+
+  /**
    * @method findMediaFromId
    * @description given a record object, use the id (@id) to return
    * the entire object
@@ -116,9 +199,24 @@ class Utils {
     return null;
   }
 
-  getThumbnailFromClientMedia(clientMedia={}) {
+  /**
+   * @method getThumbnailFromClientMedia
+   * @description medium thumbnail url for a record. Uses the document's
+   * displayImage when given, else crawls clientMedia.
+   *
+   * @param {Object} clientMedia ClientMedia instance
+   * @param {Object} opts
+   * @param {Object} opts.displayImage es document displayImage
+   *
+   * @returns {String}
+   */
+  getThumbnailFromClientMedia(clientMedia={}, opts={}) {
+    let displayUrl = opts.displayImage?.images?.medium?.url;
+    if( displayUrl ) return displayUrl;
+
     let thumbnailUrl = "";
     let graph = clientMedia.graph;
+
 
     if( !clientMedia.mediaGroups ) return thumbnailUrl;
 
@@ -143,10 +241,11 @@ class Utils {
         thumbnailUrl = firstImage?.clientMedia?.images?.medium?.url;
       } else if (mediaType === "VideoObject" || mediaType === 'AudioObject') {
         isAudioVideo = true;
-        // pull image from root node if exists
+        // pull image from root node if properly linked
         let rootNode = graph.filter((g) => g["@id"] === clientMedia["id"])[0];
-        if (rootNode) {
-          rootImage = rootNode.image?.["@id"];
+        if (rootNode?.image?.["@id"]) {
+          let imageNode = (graph || []).find((g) => g["@id"] === rootNode.image["@id"]);
+          rootImage = imageNode?.clientMedia?.images?.medium?.url || "/images/tree-bike-illustration.png";
         }
       }
     }
@@ -157,6 +256,29 @@ class Utils {
     }
 
     return thumbnailUrl;
+  }
+
+  /**
+   * @method getAltText
+   * @description get accessible alt text for an image, using a fallback chain of
+   * alternativeHeadline, then description, then name. Checks the image's own linked
+   * data node first, then falls back to the same chain on the root item record if
+   * the image has none
+   *
+   * @param {Object} imageNode linked data node for the image
+   * @param {Object} rootNode linked data node for the root item record
+   *
+   * @returns {String}
+   */
+  getAltText(imageNode={}, rootNode={}) {
+    const firstValue = (value) => Array.isArray(value) ? (value[0] || '') : (value || '');
+
+    return firstValue(imageNode.alternativeHeadline) ||
+           firstValue(imageNode.description) ||
+           firstValue(imageNode.name) ||
+           firstValue(rootNode.alternativeHeadline) ||
+           firstValue(rootNode.description) ||
+           firstValue(rootNode.name) || '';
   }
 
   getCookie(name) {
@@ -275,48 +397,6 @@ class Utils {
 
     return { pages };
   }
-
-  /**
-   * @method getAppConfigCollectionGraph
-   * @description given an id, get app_config collection graph if exists, or hit the API
-   * 
-   * @param {String} id
-   * @param {Object} fcAppConfigModel reference to model
-   */
-  async getAppConfigCollectionGraph(id, fcAppConfigModel) {
-    // let savedData = APP_CONFIG.fcAppConfig[`/application/ucd-lib-client${id.replace('/collection', '')}.jsonld.json`];
-    // if( savedData ) return savedData;
-    let savedData;
-    try {
-      savedData = await fcAppConfigModel.getCollectionAppData(id);  
-    } catch( error ) {
-      console.warn('Error getting app config collection graph for ' + id, error);
-    }
-    if( savedData && savedData.body ) return JSON.parse(savedData.body);
-    
-    return null;
-  }
-
-  /**
-   * @method getAppConfigItemGraph
-   * @description given an id, get app_config collection graph if exists, or hit the API
-   * 
-   * @param {String} id
-   * @param {Object} fcAppConfigModel reference to model
-   */
-  async getAppConfigItemGraph(id, fcAppConfigModel) {
-    // let savedData = APP_CONFIG.fcAppConfig[`/application/ucd-lib-client${id.replace('/item', '')}.jsonld.json`];
-    // if( savedData ) return savedData;
-    let savedData;
-    try {
-      savedData = await fcAppConfigModel.getItemAppData(id);  
-    } catch( error ) {
-      console.warn('Error getting app config item graph for ' + id, error);
-    }
-    if( savedData && savedData.body ) return JSON.parse(savedData.body);
-    
-    return null;     
-  }  
 
   /**
    * @method getSubjectUrl

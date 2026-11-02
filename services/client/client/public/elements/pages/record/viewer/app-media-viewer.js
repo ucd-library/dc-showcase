@@ -35,6 +35,7 @@ export default class AppMediaViewer extends Mixin(LitElement)
       bookItemId: { type: String },
       itemId: { type: String },
       isBookReader: { type: Boolean },
+      bookTitle: { type: String },
       searchResults: { type: Array },
       searchResultsCount: { type: Number },
       selectedResult: { type: Number },
@@ -64,6 +65,7 @@ export default class AppMediaViewer extends Mixin(LitElement)
     this.bookItemId = "";
     this.itemId = "";
     this.isBookReader = false;
+    this.bookTitle = '';
     this.overrideImageList = false;
     this.searchResults = [];
     this.searchResultsCount = 0;
@@ -107,7 +109,10 @@ export default class AppMediaViewer extends Mixin(LitElement)
 
     if (!mediaGroups || !mediaGroups.length || !mediaGroups.filter(m => m['@type'].length > 0).length ) {
       // try to at least load a single image as fallback
-      let thumbnailUrl = utils.getThumbnailFromClientMedia(e?.selectedRecord?.clientMedia);
+      let thumbnailUrl = utils.getThumbnailFromClientMedia(
+        e?.selectedRecord?.clientMedia,
+        { displayImage: e?.selectedRecord?.graph?.displayImage }
+      );
       if( thumbnailUrl ) {
         this.mediaType = 'image';
       } else {
@@ -119,6 +124,7 @@ export default class AppMediaViewer extends Mixin(LitElement)
 
     // check for any overrides at collection/item level for the image viewer
     this.itemId = e.selectedRecord?.graph?.root?.['@id'];
+    this.bookTitle = e.selectedRecord?.graph?.root?.name || '';
     let collectionId = e.selectedRecord?.graph?.root?.isPartOf?.filter(p => p['@id'].includes('/collection/'))?.[0]?.['@id'];
     let displayType = await this._getItemDisplayType(this.itemId, collectionId);
 
@@ -164,7 +170,7 @@ export default class AppMediaViewer extends Mixin(LitElement)
       if( selectedMediaGroup ){
         mediaType = 'image';
         let hasPdf = mediaGroups.filter(m => m.clientMedia?.pdf);
-        // if( hasPdf.length ) renderAsBr = true;
+        if( hasPdf.length ) renderAsBr = true;
       }
 
       if( !selectedMediaGroup ) {
@@ -224,7 +230,7 @@ export default class AppMediaViewer extends Mixin(LitElement)
       mediaType = 'image';
     }
 
-    if( selectedMediaGroup.id === '/item/ark:/87293/9191/images' ) {
+    if( selectedMediaGroup.id === '/item/ark:/87293/9191/imagelist' ) {
       renderAsBr = false;
       mediaType = 'image';
     }

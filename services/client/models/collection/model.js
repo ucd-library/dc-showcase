@@ -2,8 +2,8 @@ const EsDataModel = require('../../lib/es-model.js');
 const config = require('../../config.js');
 const { logger } = require('../../lib/logger.js');
 const schema = require('./schema.json');
-const clientEdits = require('../client-edits');
-const clientEditsModel = clientEdits.model;
+const appConfigModel = require('../app-config').model;
+const uriUtils = require('../../lib/uri-utils.js');
 
 class CollectionsModel extends EsDataModel {
 
@@ -61,12 +61,18 @@ class CollectionsModel extends EsDataModel {
     return resp;
   }
 
+  /**
+   * @method _appendClientEdits
+   * @description Attach the collection's display edits as `clientEdits`.
+   *
+   * @param {Object} collection collection doc, mutated in place
+   */
   async _appendClientEdits(collection) {
     if( !collection ) return collection;
-    let resp = await clientEditsModel.get(collection['@id']);
+    let resp = await appConfigModel.getCollectionEdits(collection['@id']);
 
-    if( resp?.collection ) {
-      collection['@graph'].push(resp.collection);
+    if( resp?.collection && Object.keys(resp.collection).length ) {
+      collection.clientEdits = resp.collection;
     }
   }
 
@@ -119,7 +125,7 @@ class CollectionsModel extends EsDataModel {
         query: {
           bool : {
             must : [
-              {term: {'@graph.isPartOf.@id': id}}
+              {term: {'@graph.isPartOf.@id': uriUtils.toUri(id)}}
             ]
           }
         }
@@ -183,7 +189,7 @@ class CollectionsModel extends EsDataModel {
 
     let map = {};
     for( let hit of result.hits.hits ) {
-      map[hit._source['@id']] = Array.isArray(hit._source.name) ? hit._source.name[0] : hit._source.name;
+      map[uriUtils.toPath(hit._source['@id'])] = Array.isArray(hit._source.name) ? hit._source.name[0] : hit._source.name;
     }
 
     return map;

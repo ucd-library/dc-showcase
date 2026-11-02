@@ -142,6 +142,52 @@ class CaskClient {
     return `${this.baseUrl}/api/fs${filePath}`;
   }
 
+  /**
+   * @method read
+   * @description Read a CaskFS file's content as text (`GET /api/fs/{path}`).
+   *
+   * @param {String} filePath CaskFS-absolute path
+   * @param {Object} opts currently unused
+   *
+   * @returns {Promise<String|null>} file content, or null if it doesn't exist
+   */
+  async read(filePath, opts={}) {
+    let resp = await fetch(this.fileUrl(filePath), { headers: this.headers() });
+    if( resp.status === 404 ) return null;
+    if( !resp.ok ) {
+      throw new Error(`CaskFS read failed (${resp.status}): ${await resp.text()}`);
+    }
+    return resp.text();
+  }
+
+  /**
+   * @method write
+   * @description Create or replace a CaskFS file (`PUT /api/fs/{path}`).
+   * The body can be a stream, such as an incoming request.
+   *
+   * @param {String} filePath CaskFS-absolute path
+   * @param {ReadableStream|Buffer|String} body file content
+   * @param {Object} opts {mimeType: String}
+   *
+   * @returns {Promise<Object>} CaskFS's response body
+   */
+  async write(filePath, body, opts={}) {
+    let resp = await fetch(this.fileUrl(filePath), {
+      method: 'PUT',
+      headers: {
+        ...this.headers(),
+        'Content-Type': opts.mimeType || 'application/octet-stream'
+      },
+      body,
+      duplex: 'half'
+    });
+    if( !resp.ok ) {
+      throw new Error(`CaskFS write failed (${resp.status}): ${await resp.text()}`);
+    }
+    let text = await resp.text();
+    return text ? JSON.parse(text) : {};
+  }
+
 }
 
 module.exports = new CaskClient();

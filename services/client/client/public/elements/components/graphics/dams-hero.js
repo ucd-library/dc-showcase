@@ -77,8 +77,6 @@ export default class DamsHero extends Mixin(LitElement)
    * @description Sets the background image src property.
    */
   async _setSrc(){
-    // let featuredImages = await this.FcAppConfigModel.getDefaultImagesConfig();
-    // this.srcOptions = featuredImages?.body?.featuredImages;
 
     if( !this.srcOptions || this.srcOptions.length < 1 ) {
       this.selectedSrcUrl = '/images/defaults/annual-winter-sale1952.jpg';

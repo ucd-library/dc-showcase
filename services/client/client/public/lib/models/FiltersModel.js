@@ -118,24 +118,25 @@ class FiltersModel extends BaseModel {
     this.emit(this.events.FILTER_BUCKETS_UPDATE, state)
   }
 
+  /**
+   * @method getFacets
+   * @description build the elasticsearch facets object for a search request, derived from
+   * config.elasticSearch.facets so it can't drift from the facet definitions used elsewhere
+   * (eg the yearPublished facet's esType/startField/endField, gated on APP_CONFIG.useDateRangeFields)
+   *
+   * @returns {Object}
+   */
   getFacets() {
-    return {
-      "@graph.isPartOf.@id": {
-          "type": "facet"
-      },
-      "@graph.fileFormatSimple": {
-          "type": "facet"
-      },
-      "@graph.creator.name": {
-          "type": "facet"
-      },
-      "@graph.subjects.name": {
-          "type": "facet"
-      },
-      "@graph.yearPublished": {
-          "type": "range"
-      }
+    let facets = {};
+    for( let key in config.elasticSearch.facets ) {
+      let facetConfig = config.elasticSearch.facets[key];
+      facets[key] = {
+        type : facetConfig.esType || facetConfig.type
+      };
+      if( facetConfig.startField ) facets[key].startField = facetConfig.startField;
+      if( facetConfig.endField ) facets[key].endField = facetConfig.endField;
     }
+    return facets;
   }
 
 }

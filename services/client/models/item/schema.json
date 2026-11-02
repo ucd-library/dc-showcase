@@ -157,6 +157,16 @@
       "type":  "keyword"
     },
 
+    "clientMedia" : {
+      "type" : "object",
+      "enabled" : false
+    },
+
+    "displayImage" : {
+      "type" : "object",
+      "enabled" : false
+    },
+
     "@graph.text_search_description": {
       "type": "text",
       "analyzer": "english"

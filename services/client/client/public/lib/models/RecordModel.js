@@ -253,6 +253,34 @@ class RecordModel extends ElasticSearchModel {
   }
 
 /**
+   * @method getRangeBounds
+   * @description fetch the min/max bounds for a range/range-overlap facet
+   *
+   * @param {Object} searchDocument current search document
+   * @param {String} filterKey facet/filter key to exclude from filtering
+   *
+   * @returns {Promise<Object>} resolves to the response payload ({aggregations, ...})
+   */
+  async getRangeBounds(searchDocument, filterKey) {
+    let boundsDocument = JSON.parse(JSON.stringify(searchDocument));
+    if( boundsDocument.filters ) delete boundsDocument.filters[filterKey];
+    boundsDocument.limit = 0;
+    boundsDocument.offset = 0;
+    if( !boundsDocument.textFields ) {
+      boundsDocument.textFields = config.elasticSearch.textFields.record;
+    }
+    boundsDocument.simple_query_string = true;
+
+    let response = await fetch(this.service.baseUrl, {
+      method : 'POST',
+      credentials : 'include',
+      headers : {'Content-Type' : 'application/json'},
+      body : JSON.stringify(boundsDocument)
+    });
+    return response.json();
+  }
+
+  /**
    * @method searchHighlighted
    * @description perform search for highlighted items in a collection
    * 

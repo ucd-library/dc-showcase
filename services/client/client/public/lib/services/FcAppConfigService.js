@@ -8,82 +8,28 @@ class FcAppConfigService extends BaseService {
     super();
     this.store = FcAppConfigStore;
 
-    this.baseApiUrl = '/api/application/ucd-lib-client';
+    this.appConfigApiUrl = '/api/app-config';
   }
 
-  getDefaultImagesConfig() {
+  getBrowseBySideImages() {
     return this.request({
-      url : `${this.baseApiUrl}/default-images/config.json`,
-      checkCached : () => this.store.data.defaultImages,
-      onLoading : request => this.store.setDefaultImagesConfigLoading(request),
-      onLoad : config => this.store.setDefaultImagesConfig(config),
-      onError : error => this.store.setDefaultImagesConfigError(error)
+      url : `${this.appConfigApiUrl}/browse-by/side-images`,
+      checkCached : () => this.store.data.browseBySideImages,
+      onLoading : request => this.store.setBrowseBySideImagesLoading(request),
+      onLoad : sideImages => this.store.setBrowseBySideImages(sideImages),
+      onError : error => this.store.setBrowseBySideImagesError(error)
     });
   }
 
-  getApiApplication() {
+  async saveCollectionDisplayData(id, displayData, opts={}) {
     return this.request({
-      url : `${this.baseApiUrl}`,
-      checkCached : () => this.store.data.apiApplication,
-      onLoading : request => this.store.setApiApplicationLoading(request),
-      onLoad : data => this.store.setApiApplication(data),
-      onError : error => this.store.setApiApplicationError(error)
-    });
-  }
-
-  getAdminData(id) {
-    return this.request({
-      url : `${this.baseApiUrl}${id}`,
-      checkCached : () => null,
-      onLoading : null,
-      onLoad : null,
-      onError : null
-    });
-  }
-
-  getCollectionAppData(id) {
-    return this.request({
-      url : `${this.baseApiUrl}${id}`,
-      fetchOptions : {
-        headers : {
-          'Accept' : 'application/ld+json',
-          // 'Accept' : 'application/ld+json; profile="http://www.w3.org/ns/json-ld#flattened"',
-          'Prefer' : 'return=representation; omit="http://fedora.info/definitions/fcrepo#ServerManaged"'
-        },
-      },
-      checkCached : () => this.store.data.collectionAppData[id],
-      onLoading : request => this.store.setCollectionAppDataLoading(id, request),
-      onLoad : data => this.store.setCollectionAppData(id, data),
-      onError : error => this.store.setCollectionAppDataError(id, error)
-    });
-  }
-
-  getItemAppData(id) {
-    return this.request({
-      url : `${this.baseApiUrl}${id}`,
-      fetchOptions : {
-        headers : {
-          'Accept' : 'application/ld+json',
-          // 'Accept' : 'application/ld+json; profile="http://www.w3.org/ns/json-ld#flattened"',
-          'Prefer' : 'return=representation; omit="http://fedora.info/definitions/fcrepo#ServerManaged"'
-        },
-      },
-      checkCached : () => this.store.data.itemAppData[id],
-      onLoading : request => this.store.setItemAppDataLoading(id, request),
-      onLoad : data => this.store.setItemAppData(id, data),
-      onError : error => this.store.setItemAppDataError(id, error)
-    });
-  }
-
-  async saveCollectionDisplayData(id, displayData) {    
-    return this.request({
-      url : `${this.baseApiUrl}${id}`,
+      url : `${this.appConfigApiUrl}${id}`,
       fetchOptions : {
         method : 'PUT',
         headers : {
-          'Content-Type' : 'application/ld+json'
+          'Content-Type' : 'application/json'
         },
-        body : JSON.stringify(displayData)
+        body : JSON.stringify({edit : displayData, visibility : opts.visibility})
       },
       checkCached : () => null,
       onLoading : null,
@@ -94,20 +40,25 @@ class FcAppConfigService extends BaseService {
 
   async saveCollectionFeaturedImage(id, featuredImage) {
     if( featuredImage ) {
-      await fetch(`${this.baseApiUrl}${id}/featuredImage.jpg`, {
-        method : 'PUT',
+      let resp = await fetch(`${this.appConfigApiUrl}${id}/featured-image`, {
+        method : 'POST',
         headers : {
-            'Content-Type' : 'image/jpg',
+          'Content-Type' : featuredImage.type || 'image/jpeg'
         },
-        body: featuredImage,
-        duplex: 'half'
-      }); 
+        body : featuredImage
+      });
+      if( !resp.ok ) {
+        console.warn('Featured image upload failed', resp.status);
+        return {error: true, response: resp};
+      }
+      return {response: resp};
     }
+    return null;
   }
 
   getFeaturedCollectionAppData() {
     return this.request({
-      url : `${this.baseApiUrl}/featured-collections/config.json`,
+      url : `${this.appConfigApiUrl}/featured-collections`,
       checkCached : () => null,
       onLoading : null,
       onLoad : null,
@@ -117,12 +68,11 @@ class FcAppConfigService extends BaseService {
 
   async saveFeaturedCollectionDisplayData(displayData) {
     return this.request({
-      url : `${this.baseApiUrl}/featured-collections/config.json`,
+      url : `${this.appConfigApiUrl}/featured-collections`,
       fetchOptions : {
         method : 'PUT',
         headers : {
           'Accept' : 'application/json',
-          // 'Prefer' : 'handling=lenient',
           'Content-Type' : 'application/json'
         },
         body : JSON.stringify(displayData)
@@ -136,13 +86,13 @@ class FcAppConfigService extends BaseService {
 
   async saveItemDisplayData(id, displayData) {
     return this.request({
-      url : `${this.baseApiUrl}${id}`,
+      url : `${this.appConfigApiUrl}${id}`,
       fetchOptions : {
         method : 'PUT',
         headers : {
-          'Content-Type' : 'application/ld+json'
+          'Content-Type' : 'application/json'
         },
-        body : JSON.stringify(displayData)
+        body : JSON.stringify({edit : displayData})
       },
       checkCached : () => null,
       onLoading : null,

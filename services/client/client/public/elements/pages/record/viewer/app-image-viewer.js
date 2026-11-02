@@ -87,6 +87,16 @@ export default class AppImageViewer extends Mixin(LitElement).with(
       this.media = selectedMedia.clientMedia.images;
     }
 
+    // for a single image, selectedMedia is already the image's own linked data node.
+    // for an ImageList, look up the specific page's node since selectedMedia is the list itself
+    let imageNode = {};
+    if( this.mediaType === 'ImageObject' ) {
+      imageNode = selectedMedia || {};
+    } else if( this.media?.['@id'] ) {
+      imageNode = clientMedia.getNode(this.media['@id']) || {};
+    }
+    this.title = utils.getAltText(imageNode, graph.root || {});
+
     this._renderImg();
   }
 

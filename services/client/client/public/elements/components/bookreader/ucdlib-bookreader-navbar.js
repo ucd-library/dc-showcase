@@ -101,7 +101,21 @@ export default class UcdlibBookreaderNavbar extends Mixin(LitElement)
     this._updatePageLabels();
   }
 
-  _updatePageLabels() {    
+  _onPrevKeyDown(e) {
+    if( e.key === 'Enter' || e.key === ' ' ) {
+      e.preventDefault();
+      this._prevPage();
+    }
+  }
+
+  _onNextKeyDown(e) {
+    if( e.key === 'Enter' || e.key === ' ' ) {
+      e.preventDefault();
+      this._nextPage();
+    }
+  }
+
+  _updatePageLabels() {
     // update selected page label, the page number if single page, otherwise include the page range if double page
     // if first/last page, since we don't want to show a range if we're on the first
     if( this.singlePageView || this.selectedPage === 0 ) {

@@ -8,7 +8,7 @@
 module.exports = {
   item : require('./item'),
   collection : require('./collection'),
-  'client-edits' : require('./client-edits'),
+  'app-config' : require('./app-config'),
   'page-search' : require('./page-search'),
   seo : require('./seo'),
   application : require('./application')

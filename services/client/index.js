@@ -34,6 +34,11 @@ async function main() {
   await require('./lib/es-index-init.js')();
 
   /**
+   * keep collection itemCount in sync with the item index
+   */
+  require('./lib/item-count-cron.js').start();
+
+  /**
    * mount data model APIs at /api/<name> (single process - see
    * docs/PORT-PLAN.md Phase 0)
    */

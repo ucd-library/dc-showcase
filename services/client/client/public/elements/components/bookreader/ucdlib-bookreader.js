@@ -12,6 +12,7 @@ export default class UcdlibBookreader extends Mixin(LitElement)
   static get properties() {
     return {
       book : { type: String },
+      title : { type: String },
       bookViewData : { type: Object },
       pages : { type: Array },
       page : { type: Number },
@@ -43,6 +44,7 @@ export default class UcdlibBookreader extends Mixin(LitElement)
     this.animationTime = 0.5; // seconds
 
     this.fullscreen = false;
+    this.title = '';
 
     this.zoom = 0;
     this.offsetX = 0;

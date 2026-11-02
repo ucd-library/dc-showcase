@@ -23,51 +23,6 @@ class CollectionService extends BaseService {
     });
   }
 
-  getAdminData(id) {
-    return this.request({
-      url : `${this.baseUrl}${id.replace('/collection', '')}?admin=true`,
-      checkCached : () => null,
-      onLoading : null,
-      onLoad : null,
-      onError : null
-    });
-  }
-
-  getDisplayData(id) {
-    return this.request({
-      url : '/application/ucd-lib-client'+id,
-      fetchOptions : {
-        headers : {
-          'Accept' : 'application/ld+json',
-          // 'Accept' : 'application/ld+json; profile="http://www.w3.org/ns/json-ld#flattened"',
-          'Prefer' : 'return=representation; omit="http://fedora.info/definitions/fcrepo#ServerManaged"'
-        },
-      },
-      checkCached : () => null,
-      onLoading : null,
-      onLoad : null,
-      onError : null
-    });
-  }
-
-  saveDisplayData(id, displayData) {
-    return this.request({
-      url : '/application/ucd-lib-client'+id,
-      fetchOptions : {
-        method : 'PUT',
-        headers : {
-          'Accept' : 'application/ld+json',
-          'Prefer' : 'handling=lenient'
-        },
-        body : '{' + JSON.stringify(displayData) + '}'
-      },
-      checkCached : () => null,
-      onLoading : null,
-      onLoad : null,
-      onError : null
-    });
-  }
-
   /**
    * @method searchCollection
    * @description Search the catalogs
@@ -118,7 +73,7 @@ class CollectionService extends BaseService {
    */
   async getCollectionEdits(id) {
     return this.request({
-      url : `/api/client-edits${id}`,
+      url : `/api/app-config${id}`,
       checkCached : () => this.store.data.edits[id],
       onLoading : request => this.store.setCollectionEditLoading(id, request),
       onLoad : result => this.store.setCollectionEditLoaded(id, result.body),

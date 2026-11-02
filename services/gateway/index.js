@@ -15,6 +15,26 @@ const IIIF_PATH_REGEX = /^\/iiif\/(.*)$/i;
 // This is a HACK
 const IIIF_TIF_PATH = '/images/tiled.tif';
 
+// proxied caskfs/iiif paths are read-only
+const READ_METHODS = ['GET', 'HEAD'];
+
+/**
+ * @function rejectWrite
+ * @description Send a 405 for any non-read request to a proxied file path.
+ * These proxies present the gateway's trusted CaskFS identity, so writes must
+ * go through the client app's protected api instead.
+ *
+ * @param {Object} req express request
+ * @param {Object} res express response
+ *
+ * @returns {Boolean} true if the request was rejected
+ */
+function rejectWrite(req, res) {
+  if( READ_METHODS.includes(req.method) ) return false;
+  res.set('Allow', READ_METHODS.join(', ')).status(405).send('Method not allowed');
+  return true;
+}
+
 const app = express();
 const proxy = httpProxy.createProxyServer({ xfwd: true });
 
@@ -41,8 +61,10 @@ app.use(async (req, res, next) => {
   if( !req.path.startsWith('/cask/') ) {
     return next();
   }
+  if( rejectWrite(req, res) ) return;
 
-  let caskPath = req.path.replace(/^\/cask(\/file)?/, '');
+  // /cask/api/fs, /cask/file, or bare /cask
+  let caskPath = req.path.replace(/^\/cask(\/api\/fs|\/file)?/, '');
   req.url = '/api/fs' + caskPath;
   logger.debug(`Rewriting ${req.path} -> ${req.url} to ${config.caskfs.url} for CaskFS request`);
   proxy.web(req, res, { target: config.caskfs.url, headers: caskClient.authHeaders() });
@@ -52,9 +74,13 @@ app.use(async (req, res, next) => {
   if( !IIIF_PATH_REGEX.test(req.path) ) {
     return next();
   }
+  if( rejectWrite(req, res) ) return;
 
-  let parts = req.path.split(/\/-\//);
-  let caskPath = parts[0].replace('/iiif', '');
+  // split /iiif/<cask path>/-/<iiif query>
+  let iiifPath = req.path.replace(/^\/iiif/, '');
+  let sep = iiifPath.indexOf('/-/');
+  let caskPath = sep === -1 ? iiifPath : iiifPath.slice(0, sep);
+  let iiifQuery = sep === -1 ? '' : iiifPath.slice(sep + 2);
   let metadata;
   try {
     metadata = await caskClient.getFileMetadata(caskPath);
@@ -62,8 +88,7 @@ app.use(async (req, res, next) => {
     logger.error(`Error fetching metadata for ${caskPath}: ${err.message}`);
     return res.status(500).send('Error finding cask file for IIIF request');
   }
-
-  let iiifQuery = parts[1];
+  console.log('metadata', metadata);
   let casPath = caskClient.casRelativePath(metadata.hash_value);
 
   req.url = '/'+[config.iiif.basePath, casPath, iiifQuery]
@@ -80,6 +105,7 @@ app.use(async (req, res, next) => {
   if( !GCS_PATH_REGEX.test(req.path) ) {
     return next();
   }
+  if( rejectWrite(req, res) ) return;
 
   let [itemPath, subPath] = req.path.replace('/fcrepo/rest', '').split('/svc:gcs/');
   // subpath still has old bucket name
@@ -97,6 +123,7 @@ app.use(async (req, res, next) => {
 app.use(async (req, res, next) => {
   let match = req.path.match(FCREPO_PATH_REGEX);
   if( !match ) return next();
+  if( rejectWrite(req, res) ) return;
 
   let [type, ark, subPath] = match;
 
@@ -108,8 +135,32 @@ app.use(async (req, res, next) => {
 });
 
 
-app.use((req, res) => {
-  proxy.web(req, res, { target: config.client.url });
+/**
+ * @function clientAuthHeaders
+ * @description Bearer header for the logged-in user's access token, refreshing it if expired.
+ * Requests that already send a token, or have no session, get no header.
+ *
+ * @param {Object} req express request
+ *
+ * @returns {Promise<Object>} headers to add to the client proxy request
+ */
+async function clientAuthHeaders(req) {
+  if( req.headers.authorization || !req.oidc?.isAuthenticated() ) return {};
+  let accessToken = req.oidc.accessToken;
+  if( !accessToken ) return {};
+  if( accessToken.isExpired() ) {
+    try {
+      accessToken = await accessToken.refresh();
+    } catch(e) {
+      logger.warn(`Access token refresh failed: ${e.message}`);
+      return {};
+    }
+  }
+  return { authorization: 'Bearer ' + accessToken.access_token };
+}
+
+app.use(async (req, res) => {
+  proxy.web(req, res, { target: config.client.url, headers: await clientAuthHeaders(req) });
 });
 
 app.listen(config.port, () => {
