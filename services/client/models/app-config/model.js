@@ -285,7 +285,7 @@ class AppConfigModel {
     try {
       let text = await cask.read(this.goldPath(file));
       if( text ) value = JSON.parse(text);
-      else logger.warn(`No ${file} in CaskFS gold project, run digtk showcase init-cask`);
+      else logger.warn(`No ${file} in CaskFS gold project, run node bin/init-cask.js`);
     } catch(e) {
       logger.error(`Error reading ${file}`, e);
     }

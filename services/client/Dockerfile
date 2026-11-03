@@ -17,7 +17,9 @@ RUN npm install
 COPY client client
 RUN cd client/public && npm install
 
+COPY bin bin
 COPY controllers controllers
+COPY init init
 COPY lib lib
 COPY models models
 COPY index.js .

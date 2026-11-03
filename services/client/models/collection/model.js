@@ -137,13 +137,21 @@ class CollectionsModel extends EsDataModel {
 
   /**
    * @method getPublishedDateRange
-   * @description get the published date range for a collection
+   * @description get the published date range for a collection. Uses yearPublishedStart/End
+   * when USE_DATE_RANGE_FIELDS is on, since circa/range dates leave yearPublished null.
    *
    * @param {String} id collection id
    *
    * @returns {Promise}
    */
   async getPublishedDateRange(id) {
+    let minField = '@graph.yearPublished';
+    let maxField = '@graph.yearPublished';
+    if( config.client.useDateRangeFields ) {
+      minField = '@graph.yearPublishedStart';
+      maxField = '@graph.yearPublishedEnd';
+    }
+
     let result = await this.client.search({
       index: this.itemAlias,
       body: {
@@ -155,8 +163,8 @@ class CollectionsModel extends EsDataModel {
           }
         },
         aggs: {
-          min_year: { min: { field: '@graph.yearPublished' } },
-          max_year: { max: { field: '@graph.yearPublished' } }
+          min_year: { min: { field: minField } },
+          max_year: { max: { field: maxField } }
         },
         size: 0
       }

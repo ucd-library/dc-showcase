@@ -69,7 +69,7 @@ const config = {
     // deployed alongside dams.
     url : env.CASKFS_URL || 'http://cask:3001/cask',
 
-    goldBasePath : env.CASKFS_GOLD_BASE_PATH || '/gold/dc-showcase',
+    goldBasePath : env.CASKFS_GOLD_BASE_PATH || '/gold/digital-dev',
 
     rootDir : env.CASKFS_ROOT_DIR || '/opt/cask',
 
