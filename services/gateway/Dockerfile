@@ -12,5 +12,6 @@ RUN npm install
 
 COPY index.js .
 COPY lib lib
+COPY controllers controllers
 
 CMD ["node", "index.js"]
