@@ -10,9 +10,6 @@
     "dcs-client" : {
       "contextPath" : "services/client"
     },
-    "dcs-init" : {
-      "contextPath" : "services/init"
-    },
     "dcs-iipimage-server" : {
       "contextPath" : "services/iipimage"
     },

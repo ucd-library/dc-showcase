@@ -56,24 +56,27 @@ class RecordVcModel {
       let subjects = root.subjects || [];
       if( !Array.isArray(subjects) ) subjects = [subjects];
 
-      let images;
-      if( e.payload?.clientMedia?.mediaGroups ) {
+      // index displayImage first, same as search
+      let images = e.payload?.displayImage?.images;
+      if( !images && e.payload?.clientMedia?.mediaGroups ) {
         let groups = e.payload.clientMedia.mediaGroups;
-        let group = groups.find(g => g['@type'].includes('ImageObject') || (g.filename || '').match(/\.(png|jpg)$/));
-
         let graph = e.payload.clientMedia.graph || [];
         if( !Array.isArray(graph) ) graph = [graph];
-        let graphImage = graph.find(g => g['@type'].includes('ImageObject') || (g.filename || '').match(/\.(png|jpg)$/));
 
-        let imagesWithoutErrors = groups.filter(g => g.clientMedia?.images && !g.clientMedia.images.error);
+        // types may be full schema.org uris
+        let isImage = g => [].concat(g['@type'] || []).some(t => t.endsWith('ImageObject'))
+          || (g.filename || '').match(/\.(png|jpg)$/);
+        let hasThumb = g => {
+          let i = g.clientMedia?.images;
+          return i && !i.error && (i.small || i.medium || i.large);
+        };
 
-        if( group ) {
-          images = group.clientMedia?.images;
-        } else if( graphImage && graphImage.clientMedia?.images ) {
-          images = graphImage.clientMedia?.images;
-        } else if ( imagesWithoutErrors.length ) {
-          images = imagesWithoutErrors[0].clientMedia.images;
-        }
+        let match = groups.find(g => isImage(g) && hasThumb(g))
+          || graph.find(g => isImage(g) && hasThumb(g))
+          || groups.find(hasThumb)
+          // placeholder images, e.g. audio only
+          || groups.find(g => g.clientMedia?.images && !g.clientMedia.images.error);
+        if( match ) images = match.clientMedia.images;
       }
 
       let mediaType = '';

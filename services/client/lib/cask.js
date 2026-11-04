@@ -105,6 +105,23 @@ class CaskClient {
   }
 
   /**
+   * @method exists
+   * @description Check whether a CaskFS file exists, via its metadata.
+   *
+   * @param {String} filePath CaskFS-absolute path
+   *
+   * @returns {Promise<Boolean>}
+   */
+  async exists(filePath) {
+    let resp = await fetch(`${this.baseUrl}/api/fs${filePath}?metadata=true`, { headers: this.headers() });
+    if( resp.status === 404 ) return false;
+    if( !resp.ok ) {
+      throw new Error(`CaskFS exists check failed (${resp.status}): ${await resp.text()}`);
+    }
+    return true;
+  }
+
+  /**
    * @method casRelativePath
    * @description Build the path a binary's content-addressed hash resolves
    * to, relative to CaskFS's own CAS root - mirroring CaskFS's own

@@ -105,6 +105,18 @@
       "type" : "integer"
     },
 
+    "@graph.yearPublishedStart" : {
+      "type" : "integer"
+    },
+
+    "@graph.yearPublishedEnd" : {
+      "type" : "integer"
+    },
+
+    "@graph.datePrecision" : {
+      "type" : "keyword"
+    },
+
     "name" : {
       "type": "text",
       "fields": {

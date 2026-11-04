@@ -25,6 +25,18 @@ class PG {
     return this.client.query(query, params);
   }
 
+  /**
+   * @method end
+   * @description Close the pool, so one-off scripts can exit.
+   *
+   * @returns {Promise}
+   */
+  async end() {
+    if( !this.client ) return;
+    await this.client.end();
+    this.client = null;
+  }
+
 }
 
 module.exports = new PG();

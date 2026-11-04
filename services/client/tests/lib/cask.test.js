@@ -87,6 +87,22 @@ describe('lib/cask.js', () => {
     await assert.rejects(() => cask.read('/x.json'));
   });
 
+  it('exists() checks file metadata, false on 404', async () => {
+    let calledUrl;
+    global.fetch = async (url) => {
+      calledUrl = url;
+      return new Response('{}');
+    };
+    assert.equal(await cask.exists('/gold/digital-dev/hero-banner.json'), true);
+    assert.equal(calledUrl, `${config.cask.url}${config.cask.pathPrefix}/api/fs/gold/digital-dev/hero-banner.json?metadata=true`);
+
+    global.fetch = async () => new Response('nope', { status: 404 });
+    assert.equal(await cask.exists('/x.json'), false);
+
+    global.fetch = async () => new Response('boom', { status: 500 });
+    await assert.rejects(() => cask.exists('/x.json'));
+  });
+
   it('fileUrl() builds the content-stream URL for a file path', () => {
     assert.equal(
       cask.fileUrl('/gold/digital-dev/item-a/item.jsonld.json'),
