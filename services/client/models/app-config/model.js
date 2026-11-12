@@ -10,6 +10,11 @@ const VISIBILITY = ['public', 'private'];
 // gold json cache lifetime
 const JSON_CACHE_MS = 5 * 60 * 1000;
 
+// gold project folders and files
+const STATIC_ASSETS_DIR = 'static-assets';
+const FEATURED_EDITS_FILE = 'edits/featured-collections.json';
+const COLLECTION_EDITS_DIR = 'edits/collections';
+
 /**
  * @class AppConfigModel
  * @description Collection and item display edits (watercolor, featured image,
@@ -158,13 +163,13 @@ class AppConfigModel {
 
   /**
    * @method featuredImagePath
-   * @description The CaskFS path a collection's featured image is written to, in its gold folder.
-   * The folder is the goldPath argonath indexes on the collection document.
+   * @description The CaskFS path a collection's featured image is written to, under edits/collections.
+   * The collection name is the last segment of the goldPath argonath indexes on the collection document.
    *
    * @param {String} id collection path or URI
    * @param {String} ext file extension, e.g. '.jpg'
    *
-   * @returns {Promise<String>} e.g. /gold/digital-dev/haeger/featured-image.jpg
+   * @returns {Promise<String>} e.g. /gold/digital-dev/edits/collections/haeger/featured-image.jpg
    */
   async featuredImagePath(id, ext) {
     let uri = uriUtils.toUri(id);
@@ -173,16 +178,17 @@ class AppConfigModel {
     if( !root.goldPath ) {
       throw this._badRequest('collection has no goldPath, reindex it: '+id);
     }
-    return root.goldPath + '/featured-image' + ext;
+    let name = root.goldPath.replace(/\/+$/, '').split('/').pop();
+    return this.goldPath(`${COLLECTION_EDITS_DIR}/${name}/featured-image${ext}`);
   }
 
   /**
    * @method goldPath
    * @description The CaskFS path of a file in the app's gold project folder.
    *
-   * @param {String} file e.g. featured-collection-edits.json
+   * @param {String} file e.g. edits/featured-collections.json
    *
-   * @returns {String} e.g. /gold/digital-dev/featured-collection-edits.json
+   * @returns {String} e.g. /gold/digital-dev/edits/featured-collections.json
    */
   goldPath(file) {
     return config.cask.goldBasePath + '/' + file;
@@ -195,7 +201,7 @@ class AppConfigModel {
    * @returns {Promise<Array>} saved panels, or [] if none have been saved
    */
   async getFeaturedEdits() {
-    let text = await cask.read(this.goldPath('featured-collection-edits.json'));
+    let text = await cask.read(this.goldPath(FEATURED_EDITS_FILE));
     return text ? JSON.parse(text) : [];
   }
 
@@ -213,7 +219,7 @@ class AppConfigModel {
       throw this._badRequest('featured collections must be an array of objects');
     }
     await cask.write(
-      this.goldPath('featured-collection-edits.json'),
+      this.goldPath(FEATURED_EDITS_FILE),
       JSON.stringify(panels, null, 2),
       {mimeType: 'application/json'}
     );
@@ -227,7 +233,7 @@ class AppConfigModel {
    * @returns {Promise<Array>} [{imageUrl, itemName, collectionName, itemLink, collectionLink}]
    */
   async getHeroImages() {
-    let hero = await this._readCachedJson('hero-banner.json', []);
+    let hero = await this._readCachedJson(STATIC_ASSETS_DIR + '/hero-banner.json', []);
     return hero.map(({image, ...rest}) => ({
       imageUrl : this._imageUrl(image),
       ...rest
@@ -242,7 +248,7 @@ class AppConfigModel {
    * {page, leftImgUrl, leftLabel, leftItemLink, rightImgUrl, rightLabel, rightItemLink}
    */
   async getBrowseBySideImages() {
-    let pages = await this._readCachedJson('browse-by.json', {});
+    let pages = await this._readCachedJson(STATIC_ASSETS_DIR + '/browse-by.json', {});
     let result = {};
     for( let [page, entries] of Object.entries(pages) ) {
       result[page] = entries.map(({leftImage, rightImage, ...rest}) => {
@@ -257,14 +263,14 @@ class AppConfigModel {
 
   /**
    * @method _imageUrl
-   * @description Servable url for a file in the gold project folder.
+   * @description Servable url for a file in the gold project's static-assets folder.
    *
    * @param {String} file e.g. browse-by/a.png
    *
    * @returns {String}
    */
   _imageUrl(file) {
-    return '/cask/api/fs' + this.goldPath(file);
+    return '/cask/api/fs' + this.goldPath(STATIC_ASSETS_DIR + '/' + file);
   }
 
   /**

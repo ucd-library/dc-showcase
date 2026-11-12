@@ -5,6 +5,8 @@ const config = require('../../config.js');
 const cask = require('../../lib/cask.js');
 const model = require('../../models/app-config/model.js');
 const api = require('../../models/app-config/api.js');
+const esClient = require('../../lib/es-client.js');
+const uriUtils = require('../../lib/uri-utils.js');
 
 const BASE = config.cask.goldBasePath;
 
@@ -40,7 +42,7 @@ describe('models/app-config caskfs config', () => {
   });
 
   it('GET returns the saved panels', async () => {
-    files[BASE + '/featured-collection-edits.json'] = JSON.stringify([{position: 0, type: 'single'}]);
+    files[BASE + '/edits/featured-collections.json'] = JSON.stringify([{position: 0, type: 'single'}]);
     let res = await request(app()).get('/api/app-config/featured-collections');
     assert.deepEqual(res.body, [{position: 0, type: 'single'}]);
   });
@@ -54,7 +56,7 @@ describe('models/app-config caskfs config', () => {
   it('saveFeaturedEdits() writes edits.json to the gold project', async () => {
     let panels = [{position: 0, type: 'single', collectionId: '/collection/ark:/87293/d33t9dd5t'}];
     assert.deepEqual(await model.saveFeaturedEdits(panels), panels);
-    assert.equal(writes[0].path, BASE + '/featured-collection-edits.json');
+    assert.equal(writes[0].path, BASE + '/edits/featured-collections.json');
     assert.deepEqual(JSON.parse(writes[0].body), panels);
     assert.equal(writes[0].opts.mimeType, 'application/json');
   });
@@ -67,20 +69,20 @@ describe('models/app-config caskfs config', () => {
   });
 
   it('getHeroImages() maps hero.json entries to servable urls', async () => {
-    files[BASE + '/hero-banner.json'] = JSON.stringify([{image: 'hero-banner/a.jpg', itemName: 'A', itemLink: '/item/a'}]);
+    files[BASE + '/static-assets/hero-banner.json'] = JSON.stringify([{image: 'hero-banner/a.jpg', itemName: 'A', itemLink: '/item/a'}]);
     assert.deepEqual(await model.getHeroImages(), [
-      {imageUrl: '/cask/api/fs' + BASE + '/hero-banner/a.jpg', itemName: 'A', itemLink: '/item/a'}
+      {imageUrl: '/cask/api/fs' + BASE + '/static-assets/hero-banner/a.jpg', itemName: 'A', itemLink: '/item/a'}
     ]);
   });
 
   it('getHeroImages() is [] without hero.json, and caches', async () => {
     assert.deepEqual(await model.getHeroImages(), []);
-    files[BASE + '/hero-banner.json'] = JSON.stringify([{image: 'hero-banner/a.jpg'}]);
+    files[BASE + '/static-assets/hero-banner.json'] = JSON.stringify([{image: 'hero-banner/a.jpg'}]);
     assert.deepEqual(await model.getHeroImages(), []);
   });
 
   it('getBrowseBySideImages() maps left/right images to servable urls', async () => {
-    files[BASE + '/browse-by.json'] = JSON.stringify({
+    files[BASE + '/static-assets/browse-by.json'] = JSON.stringify({
       subjectPage: [{page: 1, leftImage: 'browse-by/l.png', leftLabel: 'L', rightImage: 'browse-by/r.png'}],
       formatPage: [{page: 1, leftLabel: 'no image'}]
     });
@@ -90,8 +92,8 @@ describe('models/app-config caskfs config', () => {
     assert.deepEqual(res.body, {
       subjectPage: [{
         page: 1, leftLabel: 'L',
-        leftImgUrl: '/cask/api/fs' + BASE + '/browse-by/l.png',
-        rightImgUrl: '/cask/api/fs' + BASE + '/browse-by/r.png'
+        leftImgUrl: '/cask/api/fs' + BASE + '/static-assets/browse-by/l.png',
+        rightImgUrl: '/cask/api/fs' + BASE + '/static-assets/browse-by/r.png'
       }],
       formatPage: [{page: 1, leftLabel: 'no image'}]
     });
@@ -99,5 +101,23 @@ describe('models/app-config caskfs config', () => {
 
   it('getBrowseBySideImages() is {} without browse-by.json', async () => {
     assert.deepEqual(await model.getBrowseBySideImages(), {});
+  });
+
+  describe('featuredImagePath()', () => {
+    let originalGet;
+    beforeEach(() => { originalGet = esClient.get; });
+    afterEach(() => { esClient.get = originalGet; });
+
+    it('writes under edits/collections/<name>', async () => {
+      let uri = uriUtils.toUri('/collection/haeger');
+      esClient.get = async () => ({_source: {'@graph': [{'@id': uri, goldPath: BASE + '/collections/haeger'}]}});
+      let p = await model.featuredImagePath('/collection/haeger', '.jpg');
+      assert.equal(p, BASE + '/edits/collections/haeger/featured-image.jpg');
+    });
+
+    it('rejects a collection with no goldPath', async () => {
+      esClient.get = async () => ({_source: {'@graph': []}});
+      await assert.rejects(() => model.featuredImagePath('/collection/haeger', '.jpg'));
+    });
   });
 });
