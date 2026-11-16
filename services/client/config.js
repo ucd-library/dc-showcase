@@ -127,6 +127,9 @@ let config = {
     url: process.env.CASK_URL || 'http://cask.argonath-prod.svc.cluster.local:3001',
     pathPrefix: process.env.CASK_PATH_PREFIX || '/cask',
     user: process.env.CASK_USER || '',
+    // request header CaskFS's header-auth middleware reads the identity from,
+    // must match CaskFS's own CASKFS_HEADER_AUTH_HEADER
+    authHeader: process.env.CASK_AUTH_HEADER || 'x-anduin-user',
     // app's gold project, e.g. /gold/digital-prod
     goldBasePath: process.env.CASK_GOLD_BASE_PATH || '/gold/digital-dev'
   },

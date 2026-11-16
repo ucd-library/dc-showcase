@@ -8,7 +8,7 @@ const { logger } = require('./logger.js');
  * CaskFS's ACL is username-keyed (config.cask.user), not Keycloak-role-keyed
  * - see docs/PORT-PLAN.md Phase 1 and dams-deployment/cmds/provision-cask-dev-access.sh
  * for the full explanation - so every request presents the same fixed
- * `x-user` identity regardless of the calling browser session.
+ * identity (in the `config.cask.authHeader` header) regardless of the calling browser session.
  *
  * Identifier-to-path resolution: CaskFS paths are not derived from an
  * item's identifier (see argonath's docs/cask-conventions.md "Item
@@ -38,13 +38,14 @@ class CaskClient {
 
   /**
    * @method headers
-   * @description Build the `x-user` header CaskFS's header-auth middleware
-   * expects, presenting this server's fixed CaskFS identity.
+   * @description Build the header CaskFS's header-auth middleware expects
+   * (config.cask.authHeader, CASK_AUTH_HEADER env; must match CaskFS's own
+   * CASKFS_HEADER_AUTH_HEADER), presenting this server's fixed CaskFS identity.
    *
    * @returns {Object}
    */
   headers() {
-    return { 'x-user': JSON.stringify({ username: config.cask.user }) };
+    return { [config.cask.authHeader]: JSON.stringify({ username: config.cask.user }) };
   }
 
   /**

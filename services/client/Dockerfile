@@ -18,6 +18,9 @@ COPY client client
 RUN cd client/public && npm install
 
 COPY bin bin
+# production init script, run as a k8s job
+RUN chmod +x bin/prod-init.sh && \
+    ln -s /app/bin/prod-init.sh /usr/local/bin/dcs-prod-init
 COPY controllers controllers
 COPY init init
 COPY lib lib

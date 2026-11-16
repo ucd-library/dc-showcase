@@ -70,7 +70,7 @@ describe('lib/fcrepo-middeware.js', () => {
       `${config.cask.url}${config.cask.pathPrefix}/api/fs/gold/digital-dev/collections/c/item-a/item.jsonld.json`
     );
     assert.equal(proxyWebCalls[0].ignorePath, true);
-    assert.deepEqual(proxyWebCalls[0].headers, { 'x-user': JSON.stringify({ username: config.cask.user }) });
+    assert.deepEqual(proxyWebCalls[0].headers, { [config.cask.authHeader]: JSON.stringify({ username: config.cask.user }) });
   });
 
   it('resolves svc:iiif to the CAS-relative hash path and proxies to the IIIF service', async () => {

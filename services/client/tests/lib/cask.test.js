@@ -13,8 +13,8 @@ describe('lib/cask.js', () => {
     global.fetch = originalFetch;
   });
 
-  it('presents the configured CaskFS identity as an x-user header', () => {
-    assert.deepEqual(cask.headers(), { 'x-user': JSON.stringify({ username: config.cask.user }) });
+  it('presents the configured CaskFS identity in the configured auth header', () => {
+    assert.deepEqual(cask.headers(), { [config.cask.authHeader]: JSON.stringify({ username: config.cask.user }) });
   });
 
   it('find() calls /api/find with the given subject/limit', async () => {
