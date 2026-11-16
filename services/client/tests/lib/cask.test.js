@@ -40,11 +40,11 @@ describe('lib/cask.js', () => {
   it('resolvePath() returns the first result\'s filepath', async () => {
     global.fetch = async () => ({
       ok: true,
-      json: async () => ({ totalCount: 1, results: [{ filepath: '/gold/digital-dev/item-a/item.jsonld.json' }] })
+      json: async () => ({ totalCount: 1, results: [{ filepath: '/gold/digital-dev/collections/c/item-a/item.jsonld.json' }] })
     });
 
     let resolved = await cask.resolvePath('ark:/87287/d73035');
-    assert.equal(resolved, '/gold/digital-dev/item-a/item.jsonld.json');
+    assert.equal(resolved, '/gold/digital-dev/collections/c/item-a/item.jsonld.json');
   });
 
   it('resolvePath() returns null when nothing matches', async () => {
@@ -59,8 +59,8 @@ describe('lib/cask.js', () => {
       return { ok: true, json: async () => ({ fullPath: '/cas/ab/cd/abcd1234' }) };
     };
 
-    let metadata = await cask.getMetadata('/gold/digital-dev/item-a/photo.tif');
-    assert.equal(calledUrl, `${config.cask.url}${config.cask.pathPrefix}/api/fs/gold/digital-dev/item-a/photo.tif?metadata=true`);
+    let metadata = await cask.getMetadata('/gold/digital-dev/collections/c/item-a/photo.tif');
+    assert.equal(calledUrl, `${config.cask.url}${config.cask.pathPrefix}/api/fs/gold/digital-dev/collections/c/item-a/photo.tif?metadata=true`);
     assert.equal(metadata.fullPath, '/cas/ab/cd/abcd1234');
   });
 
@@ -75,8 +75,8 @@ describe('lib/cask.js', () => {
       return new Response('[1]');
     };
 
-    assert.equal(await cask.read('/gold/digital-dev/featured-collection-edits.json'), '[1]');
-    assert.equal(calledUrl, cask.fileUrl('/gold/digital-dev/featured-collection-edits.json'));
+    assert.equal(await cask.read('/gold/digital-dev/edits/featured-collections.json'), '[1]');
+    assert.equal(calledUrl, cask.fileUrl('/gold/digital-dev/edits/featured-collections.json'));
   });
 
   it('read() returns null for a missing file and throws on other errors', async () => {
@@ -93,8 +93,8 @@ describe('lib/cask.js', () => {
       calledUrl = url;
       return new Response('{}');
     };
-    assert.equal(await cask.exists('/gold/digital-dev/hero-banner.json'), true);
-    assert.equal(calledUrl, `${config.cask.url}${config.cask.pathPrefix}/api/fs/gold/digital-dev/hero-banner.json?metadata=true`);
+    assert.equal(await cask.exists('/gold/digital-dev/static-assets/hero-banner.json'), true);
+    assert.equal(calledUrl, `${config.cask.url}${config.cask.pathPrefix}/api/fs/gold/digital-dev/static-assets/hero-banner.json?metadata=true`);
 
     global.fetch = async () => new Response('nope', { status: 404 });
     assert.equal(await cask.exists('/x.json'), false);
@@ -105,8 +105,8 @@ describe('lib/cask.js', () => {
 
   it('fileUrl() builds the content-stream URL for a file path', () => {
     assert.equal(
-      cask.fileUrl('/gold/digital-dev/item-a/item.jsonld.json'),
-      `${config.cask.url}${config.cask.pathPrefix}/api/fs/gold/digital-dev/item-a/item.jsonld.json`
+      cask.fileUrl('/gold/digital-dev/collections/c/item-a/item.jsonld.json'),
+      `${config.cask.url}${config.cask.pathPrefix}/api/fs/gold/digital-dev/collections/c/item-a/item.jsonld.json`
     );
   });
 });

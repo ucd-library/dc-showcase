@@ -57,7 +57,7 @@ describe('lib/fcrepo-middeware.js', () => {
       assert.ok(url.includes('/api/find'));
       return {
         ok: true,
-        json: async () => ({ totalCount: 1, results: [{ filepath: '/gold/digital-dev/item-a/item.jsonld.json' }] })
+        json: async () => ({ totalCount: 1, results: [{ filepath: '/gold/digital-dev/collections/c/item-a/item.jsonld.json' }] })
       };
     };
 
@@ -67,7 +67,7 @@ describe('lib/fcrepo-middeware.js', () => {
     assert.equal(proxyWebCalls.length, 1);
     assert.equal(
       proxyWebCalls[0].target,
-      `${config.cask.url}${config.cask.pathPrefix}/api/fs/gold/digital-dev/item-a/item.jsonld.json`
+      `${config.cask.url}${config.cask.pathPrefix}/api/fs/gold/digital-dev/collections/c/item-a/item.jsonld.json`
     );
     assert.equal(proxyWebCalls[0].ignorePath, true);
     assert.deepEqual(proxyWebCalls[0].headers, { 'x-user': JSON.stringify({ username: config.cask.user }) });
@@ -82,7 +82,7 @@ describe('lib/fcrepo-middeware.js', () => {
         // not the binary itself.
         return {
           ok: true,
-          json: async () => ({ totalCount: 1, results: [{ filepath: '/gold/digital-dev/item-a/photo.tif.jsonld.json' }] })
+          json: async () => ({ totalCount: 1, results: [{ filepath: '/gold/digital-dev/collections/c/item-a/photo.tif.jsonld.json' }] })
         };
       }
       if( url.includes('metadata=true') ) {
@@ -102,7 +102,7 @@ describe('lib/fcrepo-middeware.js', () => {
     assert.equal(findCalls, 1);
     assert.equal(metadataCalls, 1);
     // metadata must be fetched for the binary itself, not its sidecar
-    assert.ok(metadataUrl.includes('/api/fs/gold/digital-dev/item-a/photo.tif?'));
+    assert.ok(metadataUrl.includes('/api/fs/gold/digital-dev/collections/c/item-a/photo.tif?'));
     assert.equal(proxyWebCalls.length, 1);
 
     let expectedQuery = new URLSearchParams({ IIIF: '/cas/abc/def/abcdef0123456789/info.json' }).toString();
@@ -115,7 +115,7 @@ describe('lib/fcrepo-middeware.js', () => {
       if( url.includes('/api/find') ) {
         return {
           ok: true,
-          json: async () => ({ totalCount: 1, results: [{ filepath: '/gold/digital-dev/item-a/photo.tif.jsonld.json' }] })
+          json: async () => ({ totalCount: 1, results: [{ filepath: '/gold/digital-dev/collections/c/item-a/photo.tif.jsonld.json' }] })
         };
       }
       return { ok: true, json: async () => ({}) };
