@@ -21,14 +21,14 @@ describe('bin/init-db.js', () => {
   });
 
   it('applies .sql files in filename order', async () => {
-    fs.writeFileSync(path.join(dir, '004-b.sql'), 'select 4;');
-    fs.writeFileSync(path.join(dir, '003-a.sql'), 'select 3;');
+    fs.writeFileSync(path.join(dir, 'b.sql'), 'select 2;');
+    fs.writeFileSync(path.join(dir, 'a.sql'), 'select 1;');
     fs.writeFileSync(path.join(dir, 'notes.txt'), 'ignored');
 
     let files = await initDb({ initDir: dir });
 
-    assert.deepEqual(files, ['003-a.sql', '004-b.sql']);
-    assert.deepEqual(queries, ['select 3;', 'select 4;']);
+    assert.deepEqual(files, ['a.sql', 'b.sql']);
+    assert.deepEqual(queries, ['select 1;', 'select 2;']);
   });
 
   it('throws when there are no .sql files', async () => {
@@ -37,6 +37,6 @@ describe('bin/init-db.js', () => {
 
   it('defaults to the bundled init/postgres files', async () => {
     let files = await initDb();
-    assert.ok(files.includes('004-app-config-edits.sql'));
+    assert.deepEqual(files, ['app-config-edits.sql', 'redirects.sql']);
   });
 });
