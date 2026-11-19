@@ -91,11 +91,48 @@ async function ensureModelIndices(model) {
   const targetIndices = Object.keys(aliasInfo);
 
   if( targetIndices.length !== 1 ) {
-    logger.warn(`[es-index-init] ${modelName}: alias '${existingAliasName}' points at multiple indices (${targetIndices.join(', ')}); repairing onto all of them`);
+    throw new Error(`[es-index-init] ${modelName}: alias '${existingAliasName}' points at multiple indices (${targetIndices.join(', ')}); refusing to add '${missingAliasName}' to all of them, fix the aliases by hand`);
   }
 
-  await client.indices.putAlias({ index: targetIndices, name: missingAliasName });
-  logger.warn(`[es-index-init] ${modelName}: repaired missing alias '${missingAliasName}' -> '${targetIndices.join(', ')}'`);
+  await client.indices.putAlias({ index: targetIndices[0], name: missingAliasName });
+  logger.warn(`[es-index-init] ${modelName}: repaired missing alias '${missingAliasName}' -> '${targetIndices[0]}'`);
+}
+
+/**
+ * @description check that a single model's `<name>-read` and `<name>-write`
+ * aliases exist and that the write alias resolves to exactly one index.
+ * Never creates or changes anything; index creation belongs to the init Job
+ * (bin/init-es.js), so app replicas can't race each other creating indices.
+ *
+ * @param {EsDataModel} model
+ *
+ * @returns {Promise}
+ */
+async function verifyModelIndices(model) {
+  const modelName = model.modelName;
+  const readAlias = model.readIndexAlias;
+  const writeAlias = model.writeIndexAlias;
+  const fix = 'run the dc-showcase init job (dcs-prod-init / bin/init-es.js)';
+
+  const [readExists, writeExists] = await Promise.all([
+    client.indices.existsAlias({ name: readAlias }),
+    client.indices.existsAlias({ name: writeAlias })
+  ]);
+
+  const missing = [];
+  if( !readExists ) missing.push(readAlias);
+  if( !writeExists ) missing.push(writeAlias);
+  if( missing.length ) {
+    throw new Error(`[es-index-init] ${modelName}: missing alias(es) ${missing.join(', ')}; ${fix}`);
+  }
+
+  const aliasInfo = await client.indices.getAlias({ name: writeAlias });
+  const targetIndices = Object.keys(aliasInfo);
+  if( targetIndices.length !== 1 ) {
+    throw new Error(`[es-index-init] ${modelName}: write alias '${writeAlias}' points at ${targetIndices.length} indices (${targetIndices.join(', ')}); ES rejects writes through it, remove the extra index/alias`);
+  }
+
+  logger.info(`[es-index-init] ${modelName}: aliases ok -> '${targetIndices[0]}'`);
 }
 
 /**
@@ -120,4 +157,28 @@ async function ensureEsIndices(modelsRegistry = require('../models/index.js')) {
   logger.info('[es-index-init] ES index/alias bootstrap complete');
 }
 
+/**
+ * @description check, without changing anything, that every ES-backed model
+ * in the given registry has a read alias and a write alias that resolves to
+ * exactly one index. Used at app startup when elasticsearch.initOnStartup is
+ * off (prod), so a missing or split alias fails the deploy instead of
+ * surfacing later as write errors.
+ *
+ * @param {Object} modelsRegistry defaults to the app's real models/index.js registry
+ *
+ * @returns {Promise}
+ */
+async function verifyEsIndices(modelsRegistry = require('../models/index.js')) {
+  const esModels = getEsModels(modelsRegistry);
+  logger.info(`[es-index-init] verifying aliases for ${esModels.length} model(s): ${esModels.map(m => m.modelName).join(', ')}`);
+
+  for( const model of esModels ) {
+    await verifyModelIndices(model);
+  }
+}
+
 module.exports = ensureEsIndices;
+module.exports.ensureEsIndices = ensureEsIndices;
+module.exports.verifyEsIndices = verifyEsIndices;
+module.exports.ensureModelIndices = ensureModelIndices;
+module.exports.verifyModelIndices = verifyModelIndices;

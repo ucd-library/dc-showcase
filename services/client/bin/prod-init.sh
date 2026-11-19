@@ -15,13 +15,14 @@
 #   CASK_USER                          - cask user with write access to
 #                                        CASK_GOLD_BASE_PATH
 #   CASK_GOLD_BASE_PATH                - the app's gold project
+#   ES_HOST, ES_PORT                   - the app's elasticsearch
 
 set -e
 
 ROOT_DIR="$( cd "$( dirname "$(readlink -f "${BASH_SOURCE[0]}")" )" >/dev/null 2>&1 && pwd )"
 cd $ROOT_DIR/..
 
-echo "Initializing dc-showcase (pg: $PG_HOST/$PG_DATABASE, cask: $CASK_URL as $CASK_USER)"
+echo "Initializing dc-showcase (pg: $PG_HOST/$PG_DATABASE, cask: $CASK_URL as $CASK_USER, es: $ES_HOST:$ES_PORT)"
 
 # install the app's dcf schema (init/postgres/*.sql). Safe to re-run.
 echo "Applying init sql"
@@ -31,5 +32,11 @@ node bin/init-db.js
 # gold project. Existing files are kept. Safe to re-run.
 echo "Seeding cask gold files: $CASK_GOLD_BASE_PATH"
 node bin/init-cask.js
+
+# create the ES indices and <model>-read/-write aliases. Done here, not at
+# app startup, so dcs-client replicas can't race and each create an index.
+# Existing aliases are kept. Safe to re-run.
+echo "Initializing elasticsearch indices: $ES_HOST:$ES_PORT"
+node bin/init-es.js
 
 echo "Done initializing dc-showcase"

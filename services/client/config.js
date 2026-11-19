@@ -41,6 +41,12 @@ let config = {
       return `http://${this.host}:${this.port}`;
     },
     log: process.env.ES_LOG_LEVEL || 'error',
+    // create missing indices/aliases at app startup (lib/es-index-init.js).
+    // Off in prod: replicas would race and each create an index, so prod
+    // creates them in the init Job (bin/init-es.js) and startup only verifies.
+    initOnStartup: process.env.ES_INIT_ON_STARTUP
+      ? process.env.ES_INIT_ON_STARTUP === 'true'
+      : env !== 'prod',
     compactTypeInclude: [
       /http:\/\/digital\.ucdavis\.edu\/schema#/,
       /http:\/\/schema\.org\//

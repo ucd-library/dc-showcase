@@ -29,9 +29,16 @@ app.get('/health', (req, res) => res.status(200).send('ok'));
 async function main() {
   /**
    * ensure <model>-read / <model>-write ES aliases exist for every
-   * ES-backed data model before any route that queries them is mounted
+   * ES-backed data model before any route that queries them is mounted.
+   * In prod the init Job creates them (bin/init-es.js) and we only verify,
+   * so multiple replicas can't race to create duplicate indices.
    */
-  await require('./lib/es-index-init.js')();
+  const esIndexInit = require('./lib/es-index-init.js');
+  if( config.elasticsearch.initOnStartup ) {
+    await esIndexInit.ensureEsIndices();
+  } else {
+    await esIndexInit.verifyEsIndices();
+  }
 
   /**
    * keep collection itemCount in sync with the item index
